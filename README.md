@@ -43,3 +43,20 @@ Hence we can run the project using
 ```bash
 python manage.py runserver
 ```
+
+## Creating an App
+
+In the directory the django project was created, we will type the command
+
+```bash
+python manage.py startapp playground
+```
+
+It will create an app with playground. Inside the app we can see multiple files. Let's go one by one to describe their responsiblities
+
+1. The `migrations` folder is responsible for generating database tables. More about this in the future section.
+2. In the `admin.py` we declare how the admin inteface is going to look like for this app.
+3. The `apps.py` is where we configure the app.
+4. In the `models.py` we pull out data from the database to show to user.
+5. Test module is where we write our tests.
+6. Views is responsible for request handler.
