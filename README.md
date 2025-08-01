@@ -60,3 +60,7 @@ It will create an app with playground. Inside the app we can see multiple files.
 4. In the `models.py` we pull out data from the database to show to user.
 5. Test module is where we write our tests.
 6. Views is responsible for request handler.
+
+## Views
+
+HTML is a request response protocol. These is where we use views in Django. In a nutshell, a view function takes a request and returns a response. More accurately it's request handler.
