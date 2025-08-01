@@ -64,3 +64,36 @@ It will create an app with playground. Inside the app we can see multiple files.
 ## Views
 
 HTML is a request response protocol. These is where we use views in Django. In a nutshell, a view function takes a request and returns a response. More accurately it's request handler.
+
+### Url Configuration
+
+When we want to configure the urls, it should starts with the app. Please note, we don't call the function we just mention the name of it without using '()'
+
+```python
+from django.urls import path
+from . import views
+
+# URLConf
+urlpatterns = [
+    path('playground/hello', views.say_hello)
+]
+```
+
+We have declared the URL in the `playground` app. However, the project does not know the route yet. Hence, it order to let it know, we have to add it into the `urls.py` of the main project.
+
+```python
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('playground/', include('playground.urls'))
+]
+```
+
+What is essentially tells, django when any request comes with 'playground', navigate it to the urls of playground app.
+
+In django, every url must end with a '/' and since`playground` has already been mentioned into the `urls.py` of the main app.
+
+```python
+urlpatterns = [
+    path('hello/', views.say_hello)
+]
+```
