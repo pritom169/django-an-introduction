@@ -97,3 +97,9 @@ urlpatterns = [
     path('hello/', views.say_hello)
 ]
 ```
+
+## Templates
+
+As we have already known views in django are not views exactly. Templates are the real views in django. Let's create a **templates** folder inside the migrations folder. Let's write `<h1>Hello World!</h1>` inside the folder.
+
+> When rendering a template, the django app looks for the `hello.html` inside the the template folder of the `playground` app. If it's there, it renders it accordingly.
