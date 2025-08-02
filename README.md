@@ -220,4 +220,4 @@ class Address(models.Model):
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
 ```
 
-The customer property creates a one-to-one relationship with the CUSTOMER table. One positive this is that, we don't have to go to the address class and repeat the same code. Django takes care of that.
+The customer property creates a one-to-one relationship with the CUSTOMER table. One positive thing is that, we don't have to go to the address class and repeat the same code. Django takes care of that.
