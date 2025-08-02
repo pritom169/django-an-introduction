@@ -107,3 +107,9 @@ As we have already known views in django are not views exactly. Templates are th
 ## Django Debug Toolbar
 
 In order to add django-toolbar to VS code project, hop into this [link](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html)
+
+# 2. Entity Diagram
+
+For more demonstation of django ORM (object relation mapping), we will use an ecommerce app. Please have a look at the ER diagram for more details.
+
+<img src="images-and-diagrams/er-diagram.png" alt="ER Diagram" width="80%">
