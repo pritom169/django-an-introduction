@@ -206,3 +206,18 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True)
     membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
 ```
+
+### Defining Relationship
+
+#### One to one relationship
+
+Let's consider how we can set up a one-to-one relationship. A customer can only have one address and an address can only be assigned to only one customer. The following code is self explanatory.
+
+```python
+class Address(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
+```
+
+The customer property creates a one-to-one relationship with the CUSTOMER table. One positive this is that, we don't have to go to the address class and repeat the same code. Django takes care of that.
