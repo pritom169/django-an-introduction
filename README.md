@@ -110,6 +110,59 @@ In order to add django-toolbar to VS code project, hop into this [link](https://
 
 # 2. Entity Diagram
 
-For more demonstation of django ORM (object relation mapping), we will use an ecommerce app. Please have a look at the ER diagram for more details.
+For more demonstration of django ORM (object relation mapping), we will use an e-commerce app. Please have a look at the ER diagram for more details.
 
 <img src="images-and-diagrams/er-diagram.png" alt="ER Diagram" width="80%">
+
+## Organizing the project
+
+As we already know, a Django project contains different apps. Let's brainstorm a way to organize our application:
+
+1. We can put Product, Collection, Cart, CartItem, Order, OrderItem and Customer into a single app named `Store`. Befits of using this application is using anyone can download the app and install it without any hassle. However, as this app grows it gets bloated with too many models. These phenomenon is called Monolith. At some point our app becomes to hard to incorporate new features and also becomes hard to maintain. Thus, we can do better.
+
+2. We should follow the UNIX philosophy, each app should do one and one thing only. This app is better than the previous one. Let's break the app into couple of different categories. Let's break down the app in the following apps.
+
+   - **Products** (Product, Collection, Tag)
+   - **Customers** (Customer) -> Depends on Product
+   - **Carts** (Cart, CartItem) -> Depends on Customers and Products
+   - **Orders** (Order, OrderItem) -> Depends on Carts and Customers
+
+   > However, it comes with one issue. We have to install in the apps in the following sequence: Product, Customers, Carts and Orders.
+
+   > Another issue we might face, is if we change something in the product, now the Carts and Orders has to be changed accordingly.
+
+As we have see two ideas are completely polarized. If we choose monolith our projects become bloated. If we fine grain our app into many apps it become hard maintain as one app becomes dependent on others. There is a sweat spot if we look carefully. So we should give attention to these two parts:
+
+1. **Minimal Coupling:** Means they should have minimal dependencies between them.
+
+2. **High Cohesion (aka Focus):** A single app should be responsible for one functionality only.
+
+Following the two principles we can divide the app into two apps:
+
+1. Store (Product, Collection, Customer, Cart, CartItem, Order, OrderItem)
+2. Tags (Tag, TaggedItem)
+
+Hence, let's go to the terminal and create the two apps via the following command:
+
+```bash
+python manage.py startapp store
+python manage.py startapp tags
+```
+
+One another responsibility comes with installing a new app that we have to include it in the `INSTALLED_APPS` of the root app inside the `settings.py`
+
+```python
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "playground",
+    "debug_toolbar",
+    "store",
+    "tags"
+]
+
+```
