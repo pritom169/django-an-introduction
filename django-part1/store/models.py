@@ -25,16 +25,16 @@ class Customer(models.Model):
     membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
 
 class Order(models.Model):
-    placed_at = models.DateTimeField(auto_created=True)
+    placed_at = models.DateTimeField(auto_now_add==True)
 
-    PENDING = 'P'
-    COMPLETE = 'C'
-    FAILED = 'F'
+    PAYMENT_STATUS_PENDING = 'P'
+    PAYMENT_STATUS_COMPLETE = 'C'
+    PAYMENT_STATUS_FAILED = 'F'
 
     PRICE_CHOICES = [
-        (PENDING, 'Pending'),
-        (COMPLETE, 'Complete'),
-        (FAILED, 'Complete')
+        (PAYMENT_STATUS_PENDING, 'Pending'),
+        (PAYMENT_STATUS_COMPLETE, 'Complete'),
+        (PAYMENT_STATUS_FAILED, 'Complete')
     ]
 
-    payment_status = models.Model(max_length=1, choices=PRICE_CHOICES, default=PENDING)
+    payment_status = models.Model(max_length=1, choices=PRICE_CHOICES, default=PAYMENT_STATUS_PENDING)
