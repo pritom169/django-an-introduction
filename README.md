@@ -221,3 +221,16 @@ class Address(models.Model):
 ```
 
 The customer property creates a one-to-one relationship with the CUSTOMER table. One positive thing is that, we don't have to go to the address class and repeat the same code. Django takes care of that.
+
+#### One to many relationship
+
+When setting one-to-many relationship, the entity which is one the end of `many` must have a variable that points to that one table it is pointing to. Look at class Address.
+
+```python
+class Address(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+```
+
+Here multiple address can be assigned to one customer. If The customer field gets deleted, all the address associated with it, will also should be deleted. Thus we have chosen models.CASCADE. If we don't want to delete them, we should have chosen models.PROTECT.
