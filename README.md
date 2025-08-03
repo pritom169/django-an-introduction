@@ -234,3 +234,24 @@ class Address(models.Model):
 ```
 
 Here multiple address can be assigned to one customer. If The customer field gets deleted, all the address associated with it, will also should be deleted. Thus we have chosen models.CASCADE. If we don't want to delete them, we should have chosen models.PROTECT.
+
+#### Many to Many relationship
+
+Just like one to one relationship, in many to many relationship we also have to mention the relationship to one class and the rest of the work will be done by django.
+
+Let's look at the class of Product and Promotion. A Product can have multiple promotion and a promotion can have multiple products. Look at the code for more reference
+
+```python
+class Promotion(modesl.Model):
+    description = models.CharField(max_length=255)
+    discount = models.FloatField()
+
+class Product(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    inventory = models.IntegerField()
+    last_update = models.DateTimeField(auto_now=True)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    promotions = models.ManyToManyField(Promotion)
+```
