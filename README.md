@@ -351,3 +351,7 @@ This code perform two tasks:
 2. Makes a composite index to make some queries performs faster. `Customer.objects.filter(last_name="Smith", first_name="John")`
 
 If perform the migration and look at the migrations folder, we see the new migration file has a very tedious name. This teaches us a lesson, the two changes we are doing should not have been done in one go, in each migration we should have at most two changes.
+
+#### Reverting Migrations
+
+Of course we can reverse our changes in git, however if we want to revert back to some version of the migration, we can simply do it typing the command `python manage.py migrate store 0003`. Just the migration number is good enough to perform the migration.
