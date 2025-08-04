@@ -326,3 +326,28 @@ python manage.py makemigrations
 ```
 
 For every app, it will create a migration file inside the `migration` folder.
+
+#### Performing Migrations
+
+Since we have done the migrations, now we have to perform the migration in order to create the database.
+
+```bash
+python manage.py migrate
+```
+
+Now say we want to change something and then want to perform the migration. Lets add the following code inside Customer class.
+
+```python
+class Meta:
+    db_table = 'store_customers'
+    indexes = [
+        models.Index(fields=['last_name', 'first_name'])
+    ]
+```
+
+This code perform two tasks:
+
+1. Changes the database table to `db_table`
+2. Makes a composite index to make some queries performs faster. `Customer.objects.filter(last_name="Smith", first_name="John")`
+
+If perform the migration and look at the migrations folder, we see the new migration file has a very tedious name. This teaches us a lesson, the two changes we are doing should not have been done in one go, in each migration we should have at most two changes.
