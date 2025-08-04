@@ -282,3 +282,37 @@ Let's focus our attention to this line `featured_product = models.ForeignKey('Pr
 3. `related_name='+'` tells Django not to create a reverse relation with Product as it would create unnecessary complexities.
 
 > Question might arise: `Why not a many-to-many relationship here?` The featured_product on Collection is a special pointer—it’s like saying “this is the star product for this collection,” and that’s it. It does not mean the product “belongs” to the collection in the regular sense. That's much different from many-to-many relationship.
+
+#### Generic Relationship
+
+Generic relationships are important as it allows the apps to be more independent of each other. Here Tag will be used with Products but in future in can be used with other apps also. It uses Django’s GenericForeignKey system (with content_type and object_id) so you can tag anything (products, blog posts, users, whatever).
+
+```python
+from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+
+class Tag(models.Model):
+    label = models.CharField(max_length=255)
+
+class TaggedItem(models.Model):
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+```
+
+- tag set to the “sale” Tag
+- content_type set to “Product”
+- object_id set to the product’s id
+- content_object lets you access the actual product directly
+
+Likewise LinkedItem entity was also created
+
+```python
+class LinkedItem(models.Model):
+    user = models.ForeignKey(User)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+```
