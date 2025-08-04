@@ -316,3 +316,13 @@ class LinkedItem(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 ```
+
+#### Creating Migrations
+
+When it comes to creating migration, we can simply perform it by typing the command
+
+```bash
+python manage.py makemigrations
+```
+
+For every app, it will create a migration file inside the `migration` folder.
