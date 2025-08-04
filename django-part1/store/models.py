@@ -2,8 +2,9 @@ from django.db import models
 
 class Collection(models.Model):
     label = models.CharField(max_length=255)
+    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
-class Promotion(modesl.Model):
+class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
 
@@ -24,7 +25,7 @@ class Customer(models.Model):
     MEMBERSHIP_CHOICES = [
         (MEMBERSHIP_BRONZE, 'Bronze'),
         (MEMBERSHIP_SILVER, 'Silver'),
-        (MEMBERSHIP_GOLD, 'Gold')
+        (MEMBERSHIP_GOLD, 'Gold'),
     ]
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -46,7 +47,7 @@ class Order(models.Model):
         (PAYMENT_STATUS_FAILED, 'Complete')
     ]
 
-    payment_status = models.Model(max_length=1, choices=PRICE_CHOICES, default=PAYMENT_STATUS_PENDING)
+    payment_status = models.CharField(max_length=1, choices=PRICE_CHOICES, default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 
 class Address(models.Model):

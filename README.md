@@ -242,9 +242,28 @@ Just like one to one relationship, in many to many relationship we also have to 
 Let's look at the class of Product and Promotion. A Product can have multiple promotion and a promotion can have multiple products. Look at the code for more reference
 
 ```python
-class Promotion(modesl.Model):
+class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
+
+class Product(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.‚DecimalField(max_digits=6, decimal_places=2)
+    inventory = models.IntegerField()
+    last_update = models.DateTimeField(auto_now=True)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    promotions = models.ManyToManyField(Promotion)
+```
+
+#### Resolving Circular Relationships
+
+For instance, we need a two way relationship within two table. In this project, for example multiple products can point to one collection and multiple collection can point to a single product. It can lead to circular dependencies. Let's look at the code for `Collection` and `Product`:
+
+```python
+class Collection(models.Model):
+    label = models.CharField(max_length=255)
+    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -255,3 +274,11 @@ class Product(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
 ```
+
+Let's focus our attention to this line `featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')`.
+
+1. `on_delete=models.SET_NULL` means if the corresponding product is deleted, set this field to NULL.
+2. `null=True` allows the featured_product to be optional. (It can be NULL in the database).
+3. `related_name='+'` tells Django not to create a reverse relation with Product as it would create unnecessary complexities.
+
+> Question might arise: `Why not a many-to-many relationship here?` The featured_product on Collection is a special pointer—it’s like saying “this is the star product for this collection,” and that’s it. It does not mean the product “belongs” to the collection in the regular sense. That's much different from many-to-many relationship.
