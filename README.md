@@ -355,3 +355,22 @@ If perform the migration and look at the migrations folder, we see the new migra
 #### Reverting Migrations
 
 Of course we can reverse our changes in git, however if we want to revert back to some version of the migration, we can simply do it typing the command `python manage.py migrate store 0003`. Just the migration number is good enough to perform the migration.
+
+#### Connecting to PostgresSQL
+
+We have created a database migration, now perform the setup for connecting to PostgreSQL. If you have postgres installed already, it's fine. If not, please follow along till the setup.
+
+1. Install postgresql through this command `brew install postgresql`. We will install brew as our package manager.
+2. Let's gets inside the postgres console. We can simply do that via performing `pspl postgres`
+3. Since we are inside the postgres command console, we will perform some operation.
+   ```bash
+   CREATE USER myuser WITH PASSWORD 'mypassword';
+   ALTER USER myuser CREATEDB;
+   CREATE DATABASE storefront OWNER myuser;
+   GRANT ALL PRIVILEGES ON DATABASE storefront TO myuser;
+   ```
+4. After we can get out of postgres command console by typing `\q``
+
+Since we have postgres installed, now we need a GUI. We can use pgAdmin, but for the this project we will use DataGrip. In Datagrip, creating a new project give the following commands. 1. Username: `myuser` 2. Password: `mypassword` 3. port: `5432` (That should be the default port)
+
+4. Once those details are entered and test connection succeeds, we are ready.
