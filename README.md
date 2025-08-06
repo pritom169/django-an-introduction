@@ -395,3 +395,23 @@ DATABASES = {
 ```
 
 Once we have installed the packages and the proper database setting has been done, we can go forward and type `python manage.py migrate`. Once databases are successfully migrated we can go to pgadmin4 console and refresh the database.
+
+#### Running Custom SQL
+
+Let's assume for a task we need to perform SQL operation. For that we will create a empty migration file via `python manage.py makemigrations store --empty`. The file will be stored in the `migrations` folder.
+
+In the migration file, inside the operations array we write this sql command.
+
+```python
+operations = [
+    migrations.RunSQL("""
+        INSERT INTO store_collection (label)
+        VALUES ('collection1')
+    """, """
+        DELETE FROM store_collection
+        WHERE label='collection1'
+    """)
+]
+```
+
+When we perform migrations via `python manage.py migrate`, the first sql command will be executed. The second command will be store and will be performed if someone performs a reverse migration using the command `python manage.py migrate store 0004`.
