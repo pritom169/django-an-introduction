@@ -371,6 +371,27 @@ We have created a database migration, now perform the setup for connecting to Po
    ```
 4. After we can get out of postgres command console by typing `\q``
 
-Since we have postgres installed, now we need a GUI. We can use pgAdmin, but for the this project we will use DataGrip. In Datagrip, creating a new project give the following commands. 1. Username: `myuser` 2. Password: `mypassword` 3. port: `5432` (That should be the default port)
+Since we have postgres installed, now we need a GUI. We will use the following credentials to connect to pgadmin4
 
 4. Once those details are entered and test connection succeeds, we are ready.
+
+### Using PostgreSQL in Django
+
+In order to connect to Postgresql, we need the following library. We can install it by typing `pip install psycopg2-binary`.
+
+Now inside settings.py in DATABASES section, we have to include the following details
+
+```python
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "storefront",
+        "HOST": "localhost",
+        "USER": "myuser",
+        "PASSWORD": "mypassword",
+        "PORT": 5432
+    }
+}
+```
+
+Once we have installed the packages and the proper database setting has been done, we can go forward and type `python manage.py migrate`. Once databases are successfully migrated we can go to pgadmin4 console and refresh the database.
