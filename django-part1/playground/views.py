@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from store import models as store_models
+from store.models import Product
 
 def say_hello(request):
+    query_set = Product.objects.all()
+    for product in query_set:
+        print(product)
+
     return render(request, 'hello.html', { 'name': 'Pritom'})
 
 # -----------ORM Showcase Helpers---------------------------
@@ -39,3 +43,23 @@ def _maybe_field(model, *candidates):
 
 def _add(lines, title, body):
     lines.append(f'## {title}\n{body}')
+
+
+# _________________Modular ORM Demo Sections_________________
+## 1. Demo for managers
+
+def demo_01_managers(models, lines):
+    Product = models.get("Product")
+    if Product:
+        qs_all = Product.objects.all()
+        _add(lines, "1. Managers & QuerySets", f"Product.objects.all() SQL: {qs_all.query}")
+    else:
+        _add(lines, "1. Managers & QuerySets", "Product model not found; skipping Product-based examples.")
+
+
+def orm_demo(request):
+    models = _get_models()
+    lines = []
+    
+    demo_01_managers(models, lines)
+    return HttpResponse("<pre>" + "\n\n".join(lines) + "</pre>")

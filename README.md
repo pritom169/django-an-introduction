@@ -415,3 +415,24 @@ operations = [
 ```
 
 When we perform migrations via `python manage.py migrate`, the first sql command will be executed. The second command will be store and will be performed if someone performs a reverse migration using the command `python manage.py migrate store 0004`.
+
+## Django ORM
+
+### 1. Managers and QuerySets
+
+Every attribute in Django has an object. It is also called manager object. It is sort of like a remote control which comes with lot of buttons which we can use to talk to our database.
+
+In `playground/views.py` we can look into the `say_hello` function. Inside it we can see the following code:
+
+```python
+def say_hello(request):
+    query_set = Product.objects.all()
+    for product in query_set:
+        print(product)
+
+    return render(request, 'hello.html', { 'name': 'Pritom'})
+```
+
+The query set `query_set = Product.objects.all()` is a lazy, chainable collection of database rows mapped to model instances (or dicts/tuples if your use values/values_list).
+
+By `Lazy` means, it does not hit the DB. I turn when you evaluate it by: - iterating over it (for p in qs:), - casting to list(qs), - calling len(qs), bool(qs), - slicing it (qs[:10]), - exists(), count(), first(), etc.
