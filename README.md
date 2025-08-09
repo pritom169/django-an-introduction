@@ -436,3 +436,50 @@ def say_hello(request):
 The query set `query_set = Product.objects.all()` is a lazy, chainable collection of database rows mapped to model instances (or dicts/tuples if your use values/values_list).
 
 By `Lazy` means, it does not hit the DB. I turn when you evaluate it by: - iterating over it (for p in qs:), - casting to list(qs), - calling len(qs), bool(qs), - slicing it (qs[:10]), - exists(), count(), first(), etc.
+
+### 2. Retrieving Objects
+
+Let's come to retrieving objects. Now let's assume we want to get only one product. That would be a single object.
+
+Let's assume we want to get the product with product id 1.
+
+```python
+product = Product.objects.get(pk=1)
+```
+
+Now, what if product_id with 1 does not exist. It will throw an exception. We can handle it using the classis try and catch block.
+
+```python
+try:
+    product = Product.objects.get(pk=0)
+except ObjectDoesNotExist:
+    pass
+```
+
+If we debug the application and look what sql code django ORM is typing for us we can find it is also doing some sql query for us.
+
+```sql
+SELECT "store_product"."id",
+       "store_product"."title",
+       "store_product"."slug",
+       "store_product"."description",
+       "store_product"."unit_price",
+       "store_product"."inventory",
+       "store_product"."last_update",
+       "store_product"."collection_id"
+  FROM "store_product"
+ WHERE "store_product"."id" = 0
+ LIMIT 21
+```
+
+As usual try catch block looks ugly. However, we can avoid them by using `filter()` and chaining it with `first()`. P.S. First can be none.
+
+```python
+product = Product.objects.filter(pk=0).first()
+```
+
+If we want to see, if a product exists or not, we can simply do it by using `exists()` in the place of `first()`.
+
+```python
+product_exists = Product.objects.filter(pk=0).exits()
+```
