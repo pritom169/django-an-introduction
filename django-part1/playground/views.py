@@ -4,11 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from store.models import Product
 
 def say_hello(request):
-    try:
-        product_exists = Product.objects.filter(pk=0).exists
-    except ObjectDoesNotExist:
-        pass
-    return render(request, 'hello.html', { 'name': 'Pritom'})
+    queryset = Product.objects.filter(title__icontains='coffee')
+
+    return render(request, 'hello.html', { 'name': 'Pritom', 'products': list(queryset)})
 
 # -----------ORM Showcase Helpers---------------------------
 def _get_models():

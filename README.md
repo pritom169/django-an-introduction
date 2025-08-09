@@ -483,3 +483,31 @@ If we want to see, if a product exists or not, we can simply do it by using `exi
 ```python
 product_exists = Product.objects.filter(pk=0).exits()
 ```
+
+## Filtering Objects
+
+Let's talk about filtering objects. If we want to filter products who price is greater than 20, we can write some filter code.
+
+```python
+queryset = Product.objects.filter(unit_price__gt=20)
+```
+
+For getting a range of product
+
+```python
+queryset = Product.objects.filter(unit_price__range=(20, 30))
+```
+
+For getting a product with a specific name is also possible.
+
+```python
+queryset = Product.objects.filter(title__contains='coffee')
+```
+
+Now this query is case sensitive. If want to make it case insensitive we can also do it using
+
+```python
+queryset = Product.objects.filter(title__icontains='coffee')
+```
+
+For more more queries please hop into the office [documentation](https://docs.djangoproject.com/en/5.2/ref/models/querysets/#field-lookups)
