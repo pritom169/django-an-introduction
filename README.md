@@ -592,6 +592,8 @@ queryset = Product.objects.values_list('id', 'title', 'collection_title')
 Now take a complex query. Let's perform one exercise. We need to sort product that have been ordered, and we can sort them by their title.
 
 ```python
+# We first need to sort the product that has been ordered by their distinct values
 ids = OrderItem.objects.values_list('product_id').distinct()
+# After we will filter them by using the product_ids that are present in the queries
 queryset = Product.objects.filter(id__in=ids).order_by('title')
 ```
