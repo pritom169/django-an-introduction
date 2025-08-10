@@ -5,8 +5,7 @@ from store.models import Product, OrderItem
 from django.db.models import Q, F
 
 def say_hello(request):
-    ids = OrderItem.objects.values_list('product_id').distinct()
-    queryset = Product.objects.filter(id__in=ids).order_by('title')
+    queryset = Product.objects.defer('description')
 
     return render(request, 'hello.html', { 'name': 'Pritom', 'products': list(queryset)})
 

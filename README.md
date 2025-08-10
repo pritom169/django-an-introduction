@@ -597,3 +597,34 @@ ids = OrderItem.objects.values_list('product_id').distinct()
 # After we will filter them by using the product_ids that are present in the queries
 queryset = Product.objects.filter(id__in=ids).order_by('title')
 ```
+
+## Deferring Fields
+
+When the database has too many fields to load we can simply avoid it by typing only.
+
+```python
+queryset = Product.objects.only('id', 'title')
+```
+
+However we need to be careful if we use only. Let's look how this can cause issue.
+
+```python
+<html>
+  <body>
+    <h1>Hello World!</h1>
+    <ul>
+      {% for product in products %}
+      <li>{{ product.title }} {{ product.unit_price }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+```
+
+These takes a massive amount of time to load. Now if we look at the sql queries, we will see it has made the query to fetch unit_price. However, the `queryset` only fetched id and title. So for `unit_price`, it had to call the database `N=1000` times for us. Moral of the story, we need to be careful when fetching the data.
+
+Let's talk about deferring. Sometime we are sure we don't want certain fields. Then we can take help of defer.
+
+```python
+queryset = Product.objects.defer('description')
+```

@@ -3,7 +3,7 @@
     <h1>Hello World!</h1>
     <ul>
       {% for product in products %}
-      <li>{{ product }}</li>
+      <li>{{ product.title }} {{ product.unit_price }}</li>
       {% endfor %}
     </ul>
   </body>
