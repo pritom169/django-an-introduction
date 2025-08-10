@@ -547,3 +547,16 @@ If we want to compare a variable with another variable inside the filter. Say we
 ```python
 queryset = Product.objects.filter(inventory=F('unit_price'))
 ```
+
+### Sorting
+
+If we want to perform some sorting. We can do them using,
+
+```python
+queryset = Product.objects.order_by('title') ## Sorting by product title
+queryset = Product.objects.order_by('unit_price', '-title')
+## Sorting by unit_price in ascending order
+## Sorting by title in descending order
+queryset = Product.objects.order_by('unit_price', '-title').reverse()
+# Reversing the order
+```
