@@ -511,3 +511,31 @@ queryset = Product.objects.filter(title__icontains='coffee')
 ```
 
 For more more queries please hop into the office [documentation](https://docs.djangoproject.com/en/5.2/ref/models/querysets/#field-lookups)
+
+#### Filtering Multiple queries
+
+When we want to put multiple conditions inside we can do it two way
+
+1. Putting all the conditions inside the parenthesis and separating them with comma
+2. We can also chain them.
+
+```python
+queryset = Product.objects.filter(inventory__lt=10, unit_price__lt=20)
+queryset = Product.objects.filter(inventory__lt=10).filter(unit_price__lt=20)
+```
+
+### Complex Lookups Using Q Objects
+
+If we want to get queries a bit more complex, we need to use Q objects. Let's look at queries.
+
+1. Filter the products where inventory < 10 OR price < 20
+
+```python
+queryset = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
+```
+
+2. Product where inventory < 10 OR not price < 20
+
+```python
+queryset = Product.objects.filter(Q(inventory__lt=10) | ~Q(unit_price__lt=20))
+```
