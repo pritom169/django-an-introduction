@@ -539,3 +539,11 @@ queryset = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
 ```python
 queryset = Product.objects.filter(Q(inventory__lt=10) | ~Q(unit_price__lt=20))
 ```
+
+### Reference Fields using F Objects
+
+If we want to compare a variable with another variable inside the filter. Say we want to compare the if inventory = price
+
+```python
+queryset = Product.objects.filter(inventory=F('unit_price'))
+```
