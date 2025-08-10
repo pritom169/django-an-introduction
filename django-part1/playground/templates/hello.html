@@ -2,8 +2,8 @@
   <body>
     <h1>Hello World!</h1>
     <ul>
-      {% for product in products %}
-      <li>{{ product.title }} {{ product.unit_price }}</li>
+      {% for order in orders %}
+      <li>{{ order.customer.first_name }} - {{ order.customer.last_name }}</li>
       {% endfor %}
     </ul>
   </body>

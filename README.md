@@ -628,3 +628,74 @@ Let's talk about deferring. Sometime we are sure we don't want certain fields. T
 ```python
 queryset = Product.objects.defer('description')
 ```
+
+### Selection of Related Objects
+
+For a moment, let's assume we want to fetch the product title and the collection it belongs to. Hence, we have written this query in our template.
+
+```html
+<html>
+  <body>
+    <h1>Hello World!</h1>
+    <ul>
+      {% for product in products %}
+      <li>{{ product.title }} {{ product.collection.title }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+```
+
+with the following query in the views.
+
+```python
+queryset = Product.objects.all()
+```
+
+If we do that we will face a similar problem we have faced before. The query takes too much time to execute.
+
+For the reason, we can preload the data from necessary field, here in our case the `collection` field.
+
+```python
+queryset = Product.objects.select_related('collection').all()
+```
+
+We have to keep one thing in mind. When the relationship is 1 to N, means a product can be associated with only one collection, we will use select_related.
+
+However we use `prefetch_related()` when the other end of the relationship has N. Means a product can be associated to many promotions.
+
+```python
+queryset = Product.objects.prefetch_related('collection').all()
+```
+
+We can also use a combination of them. We can see the product title, the collection it belongs to and all the promotions it is attached to just with this
+
+```python
+<html>
+  <body>
+    <h1>Hello World!</h1>
+    <ul>
+      {% for product in products %}
+      <li>
+        {{ product.title }} - {{ product.collection.title }}
+        <ul>
+          {% for promo in product.promotions.all %}
+          <li>{{ promo.description }}</li>
+          {% empty %}
+          <li>No promotions</li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% empty %}
+      <li>No products</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+```
+
+Let's do one exercise. Get the last 5 orders with their customer and items. That can be achieved by the following code
+
+```python
+queryset = Order.objects.select_related('customer').order_by('-placed_at')[:5]
+```

@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from store.models import Product, OrderItem
+from store.models import Product, OrderItem, Order
 from django.db.models import Q, F
 
 def say_hello(request):
-    queryset = Product.objects.defer('description')
+    queryset = Order.objects.select_related('customer').order_by('-placed_at')[:5]
 
-    return render(request, 'hello.html', { 'name': 'Pritom', 'products': list(queryset)})
+    return render(request, 'hello.html', { 'name': 'Pritom', 'orders': list(queryset)})
 
 # -----------ORM Showcase Helpers---------------------------
 def _get_models():
