@@ -560,3 +560,11 @@ queryset = Product.objects.order_by('unit_price', '-title')
 queryset = Product.objects.order_by('unit_price', '-title').reverse()
 # Reversing the order
 ```
+
+### Limiting Results
+
+Now let's assume we want to limit the result by 5.
+
+```python
+queryset = Product.objects.order_by('unit_price', '-title')[:5]
+```

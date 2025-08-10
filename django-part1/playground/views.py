@@ -5,7 +5,7 @@ from store.models import Product
 from django.db.models import Q, F
 
 def say_hello(request):
-    queryset = Product.objects.order_by('unit_price', '-title')
+    queryset = Product.objects.order_by('unit_price', '-title')[:5]
 
     return render(request, 'hello.html', { 'name': 'Pritom', 'products': list(queryset)})
 
