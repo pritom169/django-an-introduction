@@ -568,3 +568,23 @@ Now let's assume we want to limit the result by 5.
 ```python
 queryset = Product.objects.order_by('unit_price', '-title')[:5]
 ```
+
+### Selecting Fields Query
+
+If we want to get specific fields, we can simply do it by selecting values inside the quotation mark.
+
+```python
+queryset = Product.objects.values('id', 'title')
+```
+
+When we want to get something that involves multiple database tables. Let's assume we want to get the collection id in which the collection belongs.
+
+```python
+queryset = Product.objects.values('id', 'title', 'collection__title')
+```
+
+If we want to get the same data in a tuple format without mentioning the fields name, we can use `values_list`
+
+```python
+queryset = Product.objects.values_list('id', 'title', 'collection_title')
+```
