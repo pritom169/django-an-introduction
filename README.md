@@ -759,3 +759,15 @@ queryset = Customer.objects.annotate(
         orders_count=Count('order_count')
     )
 ```
+
+### Expressions
+
+Now let's assume we want to get the price list after applying discount. How can we do it.
+
+```python
+discounted_price = ExpressionWrapper(F('unit_price') * 0.8, output_field=DecimalField())
+
+queryset = Product.objects.annotate(
+    discounted_price = discounted_price
+)
+```
