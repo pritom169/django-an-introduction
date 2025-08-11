@@ -751,3 +751,11 @@ queryset = Customer.objects.annotate(
 ```
 
 ### Grouping Data
+
+If we want to see the count of orders of each customer we can also see that using the count variable.
+
+```python
+queryset = Customer.objects.annotate(
+        orders_count=Count('order_count')
+    )
+```
