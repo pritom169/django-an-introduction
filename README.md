@@ -731,3 +731,21 @@ SELECT "store_customers"."id",
        true AS "is_new"
 FROM "store_customers"
 ```
+
+### Calling Database Functions
+
+Now let's assume we want to get the full name of the customer. We can use `CONCAT` function.
+
+```python
+queryset = Customer.objects.annotate(
+    full_name=Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
+)
+```
+
+However, we can get the same result using the same query
+
+```python
+queryset = Customer.objects.annotate(
+        full_name=Concat('first_name', Value(' '), 'last_name')
+    )
+```
