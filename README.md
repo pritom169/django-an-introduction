@@ -699,3 +699,13 @@ Let's do one exercise. Get the last 5 orders with their customer and items. That
 ```python
 queryset = Order.objects.select_related('customer').order_by('-placed_at')[:5]
 ```
+
+### Aggregating Objects
+
+There are many aggregate functions inside django which we can import from `django.db.models.aggregates`.
+
+If we want to get on how many entries are in a database, we can simply do them using
+
+```python
+result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
+```
