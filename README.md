@@ -749,3 +749,5 @@ queryset = Customer.objects.annotate(
         full_name=Concat('first_name', Value(' '), 'last_name')
     )
 ```
+
+### Grouping Data
