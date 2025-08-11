@@ -709,3 +709,25 @@ If we want to get on how many entries are in a database, we can simply do them u
 ```python
 result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
 ```
+
+### Annotating Objects
+
+We can add extra fields into the table when we are fetching via aggregating function. We can add an extra field `is_new` to every customer row.
+
+```python
+queryset = Customer.objects.annotate(is_new=Value(True))
+```
+
+If you look at the specific SQL queries inside the database it is creating the following command,
+
+```python
+SELECT "store_customers"."id",
+       "store_customers"."first_name",
+       "store_customers"."last_name",
+       "store_customers"."email",
+       "store_customers"."phone",
+       "store_customers"."birth_date",
+       "store_customers"."membership",
+       true AS "is_new"
+FROM "store_customers"
+```
