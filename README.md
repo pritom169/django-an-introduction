@@ -771,3 +771,5 @@ queryset = Product.objects.annotate(
     discounted_price = discounted_price
 )
 ```
+
+> F is Django’s F expression. It lets you refer to a database field’s value directly in the query, so the math/comparison happens in SQL, not in Python. F('unit_price') \* 0.8 builds the expression “take each row’s unit_price and multiply by 0.8”.
