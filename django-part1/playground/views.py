@@ -3,7 +3,7 @@ from django.db.models import Value, F, ExpressionWrapper, DecimalField
 from store.models import Customer, Product
 
 def say_hello(request):
-    discounted_price = ExpressionWrapper(F('unit_price') * 0.8, output_field=DecimalField())
+    discounted_price = ExpressionWrapper(F('unit_price') * 0.9, output_field=DecimalField())
 
     queryset = Product.objects.annotate(
         discounted_price = discounted_price
