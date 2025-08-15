@@ -773,3 +773,9 @@ queryset = Product.objects.annotate(
 ```
 
 > F is Django’s F expression. It lets you refer to a database field’s value directly in the query, so the math/comparison happens in SQL, not in Python. F('unit_price') \* 0.8 builds the expression “take each row’s unit_price and multiply by 0.8”.
+
+### Querying Generic Relationships
+
+As we have already mentioned a the store app and models app are separated. We have deliberately kept them separate just to make them more reusable.
+
+However we can connect them using ContentType table. On the database named `content_type`. For that we need to import the models from ContentType table in order to connect those two items.
