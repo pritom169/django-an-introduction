@@ -8,4 +8,4 @@ def say_hello(request):
     queryset = Product.objects.annotate(
         discounted_price = discounted_price
     )
-    return render(request, 'hello.html', { 'name': 'Pritom', 'customer': list(queryset)})
+    return render(request, 'hello.html', {'customer': list(queryset)})
