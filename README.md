@@ -804,3 +804,27 @@ queryset = TaggedItem.objects.select_related('tag').filter(
 ```
 
 Even though we have taggedItem but the label tag is only available in the the SQL table `tags_tag`. After joining the table we will perform some filtering operation where `content_type=14`
+
+### Custom Managers
+
+If we look at the previous code, it is clearly visible it is a verbose code. It would have been really nice if we just write `TaggedItem.objects.get_tags_for(Product, 1)`
+
+We can set up our custom manager inside the model file, using the following code
+
+```python
+class TaggedItemManager(models.Manager):
+    def get_tags_for(self, obj_type, obj_id):
+        content_type = ContentType.objects.get_for_model(obj_type)
+
+        return TaggedItem.objects.select_related('tag').filter(
+            content_type = content_type,
+            object_id = obj_id
+        )
+```
+
+and inside the TaggedItem class, we can include the following code
+
+```python
+class TaggedItem(models.Model):
+    objects = TaggedItemManager()
+```
