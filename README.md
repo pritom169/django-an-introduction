@@ -848,3 +848,19 @@ list(queryset)
 ```
 
 Now storing the query will not happen as, the first query only asks for the first element, and the second query asks for all the elements.
+
+### Creating Objects
+
+What we have already done, is querying data. However, we have not entered data. However we can do it using the following command
+
+```python
+def say_hello(request):
+    collection = Collection()
+    collection.title = 'Video Games'
+    collection.featured_product = Product.objects.get(pk=1)
+    collection.save()
+
+    return render(request, 'hello.html', {'name': 'Pritom'})
+```
+
+We first introduce the collection. Afterwards we select the title and we add the featured product to primary key 1. Afterward we save the collection.
