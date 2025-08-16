@@ -779,3 +779,28 @@ queryset = Product.objects.annotate(
 As we have already mentioned a the store app and models app are separated. We have deliberately kept them separate just to make them more reusable.
 
 However we can connect them using ContentType table. On the database named `content_type`. For that we need to import the models from ContentType table in order to connect those two items.
+
+Here is a short description.
+
+```python
+def say_hello(request):
+    content_type = ContentType.objects.get_for_model(Product)
+
+    queryset = TaggedItem.objects.select_related('tag').filter(
+        content_type = content_type,
+        object_id = 1
+    )
+
+    return render(request, 'hello.html', {'name': 'Pritom', 'customer': list(queryset)})
+```
+
+Let's go through this query one by one. What this line tells, `content_type = ContentType.objects.get_for_model(Product)`, is to find the id of content_type where `app_label` is 'store' and model is 'Product'.
+
+```python
+queryset = TaggedItem.objects.select_related('tag').filter(
+    content_type = content_type,
+    object_id = 1
+)
+```
+
+Even though we have taggedItem but the label tag is only available in the the SQL table `tags_tag`. After joining the table we will perform some filtering operation where `content_type=14`

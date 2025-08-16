@@ -2,9 +2,9 @@
   <body>
     <h1>Hello World!</h1>
     <ul>
-      {% for order in orders %}
-      <li>{{ order.customer.first_name }} - {{ order.customer.last_name }}</li>
-      {% endfor %} {{customer}}
+      {% for order in tagged_items %}
+      <li>{{ ti.tag.label }}</li>
+      {% endfor %}
     </ul>
   </body>
 </html>
