@@ -828,3 +828,23 @@ and inside the TaggedItem class, we can include the following code
 class TaggedItem(models.Model):
     objects = TaggedItemManager()
 ```
+
+### Query Caching
+
+When we talk about query we have to talk about query caching. Let's look at this line of code
+
+```python
+queryset = Products.objects.alL()
+list(queryset)
+queryset[0]
+```
+
+First all the all the products will be fetched from the disk. Since it is a expensive query django will store the result of queryset. Then whichever operation we perform, django will use the stored result.
+
+```python
+queryset = Products.objects.alL()
+queryset[0]
+list(queryset)
+```
+
+Now storing the query will not happen as, the first query only asks for the first element, and the second query asks for all the elements.
