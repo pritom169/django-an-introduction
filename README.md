@@ -1045,3 +1045,24 @@ class Meta:
 ```
 
 Likewise we can implement the same collection addition, and the title ordering just by including collection.
+
+### Customizing the List Pages
+
+Let's see another way to registering the admin.
+
+```python
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['title', 'unit_price']
+    list_editable = ['unit_price']
+    list_per_page = 10
+```
+
+- `@admin.register(models.Product)` registers Product to the admin
+- `class ProductAdmin(admin.ModelAdmin):` is a class where all the configurations will be mentioned
+- `list_display = ['title', 'unit_price']` tells django to only load the **title**, **unit_price** from the database.
+- `list_per_page` allows you to limit data on per page count basis.
+
+The Customer page has also been organized in the same manner.
+
+> In order to get a full picture of allowed admin object hop into the following [link](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-objects)
