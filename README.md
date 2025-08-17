@@ -969,3 +969,22 @@ def say_hello(request):
 
     return render(request, 'hello.html', {'name': 'Pritom', 'result': list(queryset)})
 ```
+
+## Making an Admin Site
+
+### Setting Up the Admin Site
+
+As we know every Django project comes with an admin site. We can access the admin site using the link `http://localhost:8000/admin/`. In order to access the admin site we need to create a super user.
+
+We can create a super user by the following command.
+
+```bash
+python manage.py createsuperuser
+```
+
+However, we can perform even more modification. We can change the header and the index title using the following code inside `storefront/urls.py`
+
+```python
+admin.site.site_header = 'Storefront Admin'
+admin.site.index_title = 'Admin'
+```
