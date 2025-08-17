@@ -958,3 +958,14 @@ with transaction.atomic():
     item.unit_price = 10
     item.save()
 ```
+
+### Executing RAW SQL queries
+
+Sometimes we can not implement some complex queries with Django ORM. As it would lead us to writing convoluted queries. In addition, the SQL query will be much more performance efficient.
+
+```python
+def say_hello(request):
+    queryset = Product.objects.raw('SELECT * FROM store_product')
+
+    return render(request, 'hello.html', {'name': 'Pritom', 'result': list(queryset)})
+```
