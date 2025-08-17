@@ -1066,3 +1066,19 @@ class ProductAdmin(admin.ModelAdmin):
 The Customer page has also been organized in the same manner.
 
 > In order to get a full picture of allowed admin object hop into the following [link](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-objects)
+
+### Adding Computed Column
+
+Now for knowing the current status of the inventory, we may need another computer field to add. Let's assume we want to label all those inventories that has less than 10 products.
+
+- First we will add the following function into the code
+
+  ```python
+  def inventory_status(self, product):
+      if product.inventory < 10:
+          return 'Low'
+      return 'OK'
+  ```
+
+- Then we will add function name (inventory_status) to the `list_display`
+- However, it is not sortable. We can add sorting by adding the decorator `@admin.display(ordering='inventory')` on top of `inventory_status` function.
