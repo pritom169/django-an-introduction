@@ -864,3 +864,26 @@ def say_hello(request):
 ```
 
 We first introduce the collection. Afterwards we select the title and we add the featured product to primary key 1. Afterward we save the collection.
+
+Now for some reason, we don't want to update the title. We just want to update the product_key. If we do that, and look at the SQL command we will see, the title is being set to empty string and that we don't want. It is causing Data loss.
+
+```sql
+UPDATE "store_collection"
+   SET "title" = '',
+       "featured_product_id" = NULL
+ WHERE "store_collection"."id" = 11
+```
+
+The main reason of this issue is Django automatically adds `collection.title = ''`. However we can solve it by using by first reading it from the database and then updating it.
+
+```python
+collection = Collection.objects.get(pk=11)
+collection.featured_product = None
+collection.save()
+```
+
+You might argue, this extra reading may cause performance issues. However, it is the simplest way to implement it in the code. However, we can do that by using the keyword argument.
+
+```python
+Collection.objects.filter(pk=11).update(featured_product=None)
+```
