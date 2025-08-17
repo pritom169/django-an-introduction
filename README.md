@@ -905,3 +905,56 @@ Collection.objects.filter(pk__gt=5)
 ```
 
 It will look into the database and delete all the element whose primary key is above 5.
+
+### Transactions
+
+Let's assume we want to add an orderItem. Now without Order we can not import OrderItem. First we need to create an Order and OrderItem will use that value to create an OrderItem.
+
+```python
+def say_hello(request):
+    order = Order()
+    order.customer_id = 1
+    order.save()
+
+    item = OrderItem()
+    item.order = order
+    item.product_id = 1
+    item.quantity = 1
+    item.unit_price = 10
+    item.save()
+```
+
+Since it is a sequential order, in other words, if for some part fails in creating the Order and OrderItem, the other part will be inconsistent. As a result, we have to make sure the one part fails, the whole operation should be rolled back. We can exactly do that by the help of Transactions.
+
+We can wrap a whole function inside a Transaction by using `@transaction.atomic()` decorator.
+
+```python
+@transaction.atomic()
+def say_hello(request):
+    order = Order()
+    order.customer_id = 1
+    order.save()
+
+    item = OrderItem()
+    item.order = order
+    item.product_id = 1
+    item.quantity = 1
+    item.unit_price = 10
+    item.save()
+```
+
+Now let's assume we want to enclose certain part of the the code inside a function into the transaction. We can do that using `with transaction.atomic()``
+
+```python
+with transaction.atomic():
+    order = Order()
+    order.customer_id = 1
+    order.save()
+
+    item = OrderItem()
+    item.order = order
+    item.product_id = 1
+    item.quantity = 1
+    item.unit_price = 10
+    item.save()
+```
