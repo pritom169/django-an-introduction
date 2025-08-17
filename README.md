@@ -484,7 +484,7 @@ If we want to see, if a product exists or not, we can simply do it by using `exi
 product_exists = Product.objects.filter(pk=0).exits()
 ```
 
-## Filtering Objects
+### Filtering Objects
 
 Let's talk about filtering objects. If we want to filter products who price is greater than 20, we can write some filter code.
 
@@ -598,7 +598,7 @@ ids = OrderItem.objects.values_list('product_id').distinct()
 queryset = Product.objects.filter(id__in=ids).order_by('title')
 ```
 
-## Deferring Fields
+### Deferring Fields
 
 When the database has too many fields to load we can simply avoid it by typing only.
 
