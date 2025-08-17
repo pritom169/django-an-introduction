@@ -887,3 +887,21 @@ You might argue, this extra reading may cause performance issues. However, it is
 ```python
 Collection.objects.filter(pk=11).update(featured_product=None)
 ```
+
+### Deleting Objects
+
+We have seen how to read objects, how to delete objects, and now we have to know to delete objects. It is actually pretty simple in Django. Let's look at this code for a bit.
+
+```python
+def say_hello(request):
+    collection = Collection(pk=11)
+    collection.delete()
+```
+
+If we want to delete multiple elements from a database table we can simply do it using filter function.
+
+```python
+Collection.objects.filter(pk__gt=5)
+```
+
+It will look into the database and delete all the element whose primary key is above 5.
