@@ -988,3 +988,60 @@ However, we can perform even more modification. We can change the header and the
 admin.site.site_header = 'Storefront Admin'
 admin.site.index_title = 'Admin'
 ```
+
+### Registering Models
+
+In order to register for models, we need to go the `admin.py` file and register the models. If we want to register the Collection model, we can simply do that using
+
+```python
+admin.site.register(models.Collection)
+```
+
+After registering the models if we go to the admin panel we will see all the collections. However the collections will be represented a more vague format. We will see a list sort of like this one
+
+```
+Collection object (10)
+Collection object (9)
+Collection object (8)
+Collection object (7)
+Collection object (6)
+Collection object (5)
+Collection object (4)
+Collection object (3)
+Collection object (2)
+Collection object (1)
+```
+
+However, this is not very meaningful as looking at it we are not understanding anything. However, we can change by adding a very simple function. The function would be
+
+```python
+def __str__(self):
+    return self.title
+```
+
+- **str** is a special Python method that defines the human-readable string representation of an object.
+- Inside the function we will return the title.
+
+Now we see the following collection
+
+```
+Magazines
+Toys
+Spices
+Baking
+Pets
+Stationary
+Cleaning
+Beauty
+Grocery
+Flowers
+```
+
+If we want the titles to to come in sorted manner, we can implement them by including a Meta class. Inside the meta class we can include stuffs like ordering, table name, and indexes. Here we are only concerned with the ordering.
+
+```python
+class Meta:
+    ordering = ['title']
+```
+
+Likewise we can implement the same collection addition, and the title ordering just by including collection.
