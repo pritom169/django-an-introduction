@@ -1082,3 +1082,15 @@ Now for knowing the current status of the inventory, we may need another compute
 
 - Then we will add function name (inventory_status) to the `list_display`
 - However, it is not sortable. We can add sorting by adding the decorator `@admin.display(ordering='inventory')` on top of `inventory_status` function.
+
+### Selecting Related Objects
+
+When it comes to selecting related fields, we can do it in a certain way to make it bit more performance efficient.
+
+- First we will preload the necessary table for adding related tables. We will pre load all the collection that the product belongs to via `list_select_related = ['collection']`
+- We will get the collection title, via the following command
+  ```python
+  def collection_title(self, product):
+      return product.collection.title
+  ```
+- After that, we will add the collection_title into `list_display` array.
