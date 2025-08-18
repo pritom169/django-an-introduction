@@ -1094,3 +1094,19 @@ When it comes to selecting related fields, we can do it in a certain way to make
       return product.collection.title
   ```
 - After that, we will add the collection_title into `list_display` array.
+
+### Overriding the Base QuerySet
+
+In we can get the base querySet that Django Admin uses to fetch via
+
+```python
+def get_queryset(self, request):
+    return super().get_queryset(request).annotate(
+        products_count = Count('product')
+    )
+```
+
+get_queryset(self, request) overrides the base queryset that Django Admin uses to fetch rows for the changelist.
+
+- By default, super().get_queryset(request) returns a plain queryset of the model (Collection.objects.all() with admin filters/permissions applied).
+- .annotate(products_count=Count('product')), so every Collection row comes with an extra computed column (products_count).
