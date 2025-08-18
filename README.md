@@ -1110,3 +1110,20 @@ get_queryset(self, request) overrides the base queryset that Django Admin uses t
 
 - By default, super().get_queryset(request) returns a plain queryset of the model (Collection.objects.all() with admin filters/permissions applied).
 - .annotate(products_count=Count('product')), so every Collection row comes with an extra computed column (products_count).
+
+### Providing
+
+In the product count column, when we click on it, we just want to see the product which is associated with the current column.
+
+```python
+def products_count(self, collection):
+        url = (reverse('admin:store_product_changelist')
+        + '?'
+        + urlencode({
+            'collection__id': str(collection.id)
+        }))
+        return format_html('<a href="{}">{}</a>', url, collection.products_count)
+```
+
+- `reverse('admin:store_product_changelist')` get the admin page link
+- `urlencode({'collection__id': str(collection.id)}))` adds the queries in a dictionary format.
