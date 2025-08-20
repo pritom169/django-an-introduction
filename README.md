@@ -1146,3 +1146,19 @@ url = (reverse('admin:store_product_changelist')
 ```
 
 Here is the full code for more demonstration.
+
+### Adding Search to the List Page
+
+If we want to search customers by their name, we can include the `search_fields = ['first_name', 'last_name']`.
+
+But there is a problem with it, if we put "n" into the search field, it shows all the names that includes the character 'n'. However what we want to have is the first character of first name or last name 'm'. We have to change the search filed to something like this
+
+```python
+search_fields = ['first_name__startswith', 'last_name__startswith']
+```
+
+Now this comes with another issue, if we just put 'm' into the search field, it shows nothing. As there is no names starting with `m`, the search result it empty. What this tells us, we have to make the search result character insensitive.
+
+```python
+search_fields = ['first_name__istartswith', 'last_name__istartswith']
+```
