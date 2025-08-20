@@ -1197,3 +1197,33 @@ class InventoryFilter(admin.SimpleListFilter):
 - By `inventory` function, we are deciding how to filter the products when a product query is clicked
   - If user selects Low, then self.value() becomes '<10'.
   - So it returns queryset.filter(inventory\_\_lt=10), i.e. products with fewer than 10 items in stock.
+
+### Creating Custom Actions
+
+- `actions = ['clear_inventory']` tells Django admin to register an action at the top dropdown bar and look for other details to the function `clear_inventory`
+
+Let's hop into the function `clear_inventory`
+
+```python
+@admin.action(description='Clear inventory')
+    def clear_inventory(self, request, queryset):
+        updated_count = queryset.update(inventory=0)
+        self.message_user(
+            request,
+            f'{updated_count} products were successfully updated.',
+            messages.ERROR
+        )
+```
+
+- `queryset.update(inventory=0)` allows to make the inventory update the selected inventory selections.
+- ```python
+  self.message_user(
+      request,
+      f'{updated_count} products were successfully updated.',
+      messages.SUCCESS
+      )`
+  ```
+
+```
+    it sets the message for updating.
+```
