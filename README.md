@@ -1227,3 +1227,28 @@ Let's hop into the function `clear_inventory`
 ```
     it sets the message for updating.
 ```
+
+### Customizing Forms
+
+If we go to individual product forms, we can see a custom update page with all the updating options. However, we can customize them even more.
+
+- If we want to show certain fields, we can do that using fields property `fields = ['title', 'slug']`
+- If we want to show every field, except some fields we can do them using `exclude = ['promotions']`
+- If we want to make a field readonly, we can make it readonly by `readonly = ['promotions']`
+- Now it would be nice, when we populate title field, the slug field automatically gets populated. However, we have to keep one thing in mind, if we touch the slug field and go to the title field again, this feature will not work.
+
+```python
+prepopulated_fields = {
+        'slug': ['title']
+    }
+```
+
+- The collection dropdown field is where we should put our attention. If we put look at the dropdown, it loads all the collection name at once. If the collection list was bigger, it would have a bit of overhead. We can implement them by simply using `autocomplete_fields`.
+
+  - However just putting `autocomplete_fields` is not good enough. We will see some error in the terminal.
+  - As we are trying the search all the Collections by their title, we have to go to `CollectionAdmin` class and add `search_fields = ['title']`
+  - Once we do it, we can see when we load up the collection field we don't see all of the collection name being loaded at once. Once we write a title and pause our writing for a moment, it gives us all the matching titles with collection.
+
+- If you want to go crazy with all the other configuration, hop into [Django Model Admin Page] (https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-options)
+
+- Now if we want to add another order we need to select a payment status and a customer. We see the same problem appearing again. Thus, we will add `autocomplete_fields = ['customer']` to our OrderAdmin class. However, we don't need to add further search field into CustomerAdmin class as we already added the search criteria in customer
