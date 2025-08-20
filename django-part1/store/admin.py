@@ -86,7 +86,7 @@ class CustomerAdmin(admin.ModelAdmin):
         return super().get_queryset(request).annotate(
             orders_count = Count('order'))
 
-class OrderItemInline(admin.TabularInline):
+class OrderItemInline(admin.StackedInline):
     autocomplete_fields = ['product']
     model = models.OrderItem
     extra = 0

@@ -1267,3 +1267,20 @@ Now let's shift our attention to the validators. The unit price accepts negative
 - Inside the `unit_price` we will add `validators=[MinValueValidator(1)`
 
 We can learn more about validator from [Django Validators](https://docs.djangoproject.com/en/5.2/ref/validators/)
+
+### Editing Children Using Inlines
+
+Now when we try to add an order, we must also an OrderItem to an Order. We can add them using `TabularInline`. Let's look at the code.
+
+- `inlines = [OrderItemInline]` inlines help you to edit related models on the same page as the parent model.
+- Now let's look at the code of `OrderItemInline`
+  - `model = models.OrderItem` the model name needs to be mentioned.
+  - If we don't want to show some field extra, we can give `extra = 0`
+- Now if we want individual entities of the children to be present as a List format, we use `StackedInline`
+
+```python
+class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ['product']
+    model = models.OrderItem
+    extra = 0
+```
