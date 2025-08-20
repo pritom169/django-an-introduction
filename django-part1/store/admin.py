@@ -17,7 +17,6 @@ class InventoryFilter(admin.SimpleListFilter):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
 
-
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']

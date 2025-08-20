@@ -1195,4 +1195,5 @@ class InventoryFilter(admin.SimpleListFilter):
   - Key: '<10' (internal value used in the querystring)
   - Label: 'Low' (what the admin user sees in the sidebar)
 - By `inventory` function, we are deciding how to filter the products when a product query is clicked
--
+  - If user selects Low, then self.value() becomes '<10'.
+  - So it returns queryset.filter(inventory\_\_lt=10), i.e. products with fewer than 10 items in stock.
