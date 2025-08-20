@@ -47,12 +47,8 @@ class CustomerAdmin(admin.ModelAdmin):
 
     @admin.display(ordering='orders_count',description="Orders")
     def orders_count(self, customer):
-        url = reverse('admin:store_customer_changelist'
-                      +
-                      '?'
-                      + urlencode({
-                          'collection__id': str(customer.id)
-                      }))
+        url = (reverse('admin:store_order_changelist') + '?'+ urlencode({
+                          'customer__id': str(customer.id)}))
         return format_html('<a href="{}">{}</a>', url, customer.orders_count)
     
     def get_queryset(self, request):

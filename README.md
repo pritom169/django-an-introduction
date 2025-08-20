@@ -1127,3 +1127,22 @@ def products_count(self, collection):
 
 - `reverse('admin:store_product_changelist')` get the admin page link
 - `urlencode({'collection__id': str(collection.id)}))` adds the queries in a dictionary format.
+
+### Providing Links to other pages
+
+Now we can provide links to other pages. Let's take one scenario, we want to see how many products are inside on collection.
+
+1. First we add proper reverse link, `(reverse('admin:store_product_changelist')`.
+   - The reverse link follows the following criteria. `admin:appname_propertyname_changeList`
+2. We add '?' next to the admin link just to encode more parameters afterwards
+3. Then we put the `id` just to sort them by the foreign_key
+
+```python
+url = (reverse('admin:store_product_changelist')
+        + '?'
+        + urlencode({
+            'collection__id': str(collection.id)
+        }))
+```
+
+Here is the full code for more demonstration.
