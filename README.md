@@ -1252,3 +1252,18 @@ prepopulated_fields = {
 - If you want to go crazy with all the other configuration, hop into [Django Model Admin Page] (https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-options)
 
 - Now if we want to add another order we need to select a payment status and a customer. We see the same problem appearing again. Thus, we will add `autocomplete_fields = ['customer']` to our OrderAdmin class. However, we don't need to add further search field into CustomerAdmin class as we already added the search criteria in customer
+
+### Adding Data Validation
+
+If we go to any page where entities (products, orders) has been added, we will see if we click on the save button without populating any field, it will show some proper validation.
+
+- However we can go even further, when adding product we have to add description field. However we can make them optional. Inside the Product class, we have to add the following field `description = models.TextField(null=True, blank=True)`. - `null=True` makes it nullable on the database level - `blank=True` makes it nullable on the admin sites.
+
+- Now we need to save the migrations into a migration file by using `python manage.py makemigrations store`. Afterwards, we can migrate using the command `python manage.py migrate`
+
+Now let's shift our attention to the validators. The unit price accepts negative value which should not be the case.
+
+- We will first go the `models.py` file and import them from `from django.core.validators import MinValueValidator`
+- Inside the `unit_price` we will add `validators=[MinValueValidator(1)`
+
+We can learn more about validator from [Django Validators](https://docs.djangoproject.com/en/5.2/ref/validators/)
