@@ -1162,3 +1162,37 @@ Now this comes with another issue, if we just put 'm' into the search field, it 
 ```python
 search_fields = ['first_name__istartswith', 'last_name__istartswith']
 ```
+
+### Adding Filtering to the List page
+
+Say in the admin product page we want to filter using `collection`, `last_update`. We can do them by simply adding them into the property.
+
+```python
+list_filter = ['collection','last_update']
+```
+
+For some reason, let's assume assume we need to create a custom filter. Let's look at the code, let's see how we can do that.
+
+```python
+class InventoryFilter(admin.SimpleListFilter):
+    title = 'inventory'
+    parameter_name = 'inventory'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('<10', 'Low')
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == '<10':
+            return queryset.filter(inventory__lt=10)
+```
+
+- `InventoryFilter(admin.SimpleListFilter)` We are making a customer filter page for Django admin. The filter will appear in the sidebar.
+- `title = 'inventory'` makes sure the label shown in the sidebar appears as `<10`.
+- `parameter_name = 'inventory'` means the URL would be '/admin/store/product/?inventory=<10'
+- By `lookups` function we are mentioning the filter criteria. Here is only one option
+  - Key: '<10' (internal value used in the querystring)
+  - Label: 'Low' (what the admin user sees in the sidebar)
+- By `inventory` function, we are deciding how to filter the products when a product query is clicked
+-
