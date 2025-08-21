@@ -39,6 +39,7 @@ class CollectionAdmin(admin.ModelAdmin):
         )
 
 class TagInline(GenericTabularInline):
+    autocomplete_fields = ['tag']
     model = TaggedItem
     extra = 0
 
