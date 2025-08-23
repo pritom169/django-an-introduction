@@ -1299,3 +1299,27 @@ class OrderItemInline(admin.TabularInline):
 - In order to search the tags, we have to go a little bit further.
   - For the inline class to work inside the product page of ProductAdmin, we have include it inside the inlines array `inlines = [TagInline]`
   - Now we we have to remove `admin.site.register(Tag)` and replace it with `@admin.register(Tag)` as we are using the decorator on top of the function.
+
+### Extending Pluggable Apps
+
+Right now in the `admin.py` of store app still depends on the `admin.py` of the tags app. However that was not the initial intentions.
+
+- In order to make the app separate, we need to create a new app. We will create the app using `python manage.py startapp store_custom`.
+- We are moving the inline class here
+  ```python
+      class TagInline(GenericTabularInline):
+      autocomplete_fields = ['tag']
+      model = TaggedItem
+      extra = 0
+  ```
+- Extending the CustomProductAdmin class here
+  ```python
+  class CustomProductAdmin(ProductAdmin):
+      inlines = [TagInline]
+  ```
+- Now we have to deregister the Product app, as Django admin does not allow to register same model twice. As a result we first de-registering the model and registering it again with `ProductAdmin` app.
+
+  ```python
+  admin.site.unregister(Product)
+  admin.site.register(Product, CustomProductAdmin)
+  ```
