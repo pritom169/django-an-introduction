@@ -1,20 +1,10 @@
 # Storefront (Django Demo)
 
-A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **Admin customization**, **generic relations (tags)**, and **PostgreSQL**. This README is a short, practical guide. Deep tutorials can be found in **`docs/tutorial.md`**.
-
-## Table of Contents
-
-- [Features](#features)
-- [Project Setup](#project-setup)
-- [Creation of the Apps](#creation-of-the-apps)
-- [Views)](#views)
-- [Admin Preview](#admin-preview)
-- [Troubleshooting](#troubleshooting)
-- [Further Reading](#further-reading)
-
----
+A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **Admin customization**, **generic relations (tags)**, and **PostgreSQL**. Deep tutorials can be found in **`django-part1/README.md`**.
 
 ## Features
+
+### Django Part 1
 
 - **Apps**: `store` (products, orders, customers) and `tags` (generic tagging via `GenericForeignKey`).
 - **Admin**:
