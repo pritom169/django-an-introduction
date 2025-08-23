@@ -1284,3 +1284,18 @@ class OrderItemInline(admin.TabularInline):
     model = models.OrderItem
     extra = 0
 ```
+
+### Using Generic Relationship
+
+- In order to register for generic relations, between Product and Tag we will first register the Tag in the `admin.py` by using `admin.site.register(Tag)`
+- Then in the `models.py` inside the Tag model we will return the label using `def __str__(self)`
+- Afterwards we have to import `from django.contrib.contenttypes.admin import GenericTabularInline` in order to support the generic-relationships
+- Afterwards, we will make a class `TagInline(GenericTabularInline)`
+  ```python
+  class TagInline(GenericTabularInline):
+      model = TaggedItem
+      extra = 0
+  ```
+- In order to search the tags, we have to go a little bit further.
+  - For the inline class to work inside the product page of ProductAdmin, we have include it inside the inlines array `inlines = [TagInline]`
+  - Now we we have to remove `admin.site.register(Tag)` and replace it with `@admin.register(Tag)` as we are using the decorator on top of the function.
