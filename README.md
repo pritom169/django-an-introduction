@@ -5,9 +5,9 @@ A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **
 ## Table of Contents
 
 - [Features](#features)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Database (SQLite or PostgreSQL)](#database-sqlite-or-postgresql)
+- [Project Setup](#project-setup)
+- [Creation of the Apps](#creation-of-the-apps)
+- [Views)](#views)
 - [Admin Preview](#admin-preview)
 - [Troubleshooting](#troubleshooting)
 - [Further Reading](#further-reading)
@@ -68,7 +68,7 @@ Hence we can run the project using
 python manage.py runserver
 ```
 
-## 2. Creating an App
+## Creation of the Apps
 
 In the directory the django project was created, we will type the command
 
@@ -85,7 +85,7 @@ It will create an app with playground. Inside the app we can see multiple files.
 5. Test module is where we write our tests.
 6. Views is responsible for request handler.
 
-## 3. Views
+## Views
 
 HTML is a request response protocol. These is where we use views in Django. In a nutshell, a view function takes a request and returns a response. More accurately it's request handler.
 
@@ -122,7 +122,7 @@ urlpatterns = [
 ]
 ```
 
-## 4. Templates
+## Templates
 
 As we have already known views in django are not views exactly. Templates are the real views in django. Let's create a **templates** folder inside the migrations folder. Let's write `<h1>Hello World!</h1>` inside the folder.
 
