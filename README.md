@@ -1,4 +1,18 @@
-# Django - An Introduction
+# Storefront (Django Demo)
+
+A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **Admin customization**, **generic relations (tags)**, and **PostgreSQL**. This README is a short, practical guide. Deep tutorials can be found in **`docs/tutorial.md`**.
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Database (SQLite or PostgreSQL)](#database-sqlite-or-postgresql)
+- [Admin Preview](#admin-preview)
+- [Troubleshooting](#troubleshooting)
+- [Further Reading](#further-reading)
+
+---
 
 ## 1. Project Setup
 
@@ -44,7 +58,7 @@ Hence we can run the project using
 python manage.py runserver
 ```
 
-## Creating an App
+## 2. Creating an App
 
 In the directory the django project was created, we will type the command
 
@@ -61,7 +75,7 @@ It will create an app with playground. Inside the app we can see multiple files.
 5. Test module is where we write our tests.
 6. Views is responsible for request handler.
 
-## Views
+## 3. Views
 
 HTML is a request response protocol. These is where we use views in Django. In a nutshell, a view function takes a request and returns a response. More accurately it's request handler.
 
@@ -98,7 +112,7 @@ urlpatterns = [
 ]
 ```
 
-## Templates
+## 4. Templates
 
 As we have already known views in django are not views exactly. Templates are the real views in django. Let's create a **templates** folder inside the migrations folder. Let's write `<h1>Hello World!</h1>` inside the folder.
 
@@ -114,7 +128,7 @@ For more demonstration of django ORM (object relation mapping), we will use an e
 
 <img src="images-and-diagrams/er-diagram.png" alt="ER Diagram" width="80%">
 
-## Organizing the project
+## 5. Organizing the project
 
 As we already know, a Django project contains different apps. Let's brainstorm a way to organize our application:
 
@@ -166,7 +180,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-## Models
+## 6. Models
 
 When creating a model, we put considerations into two details.
 
@@ -327,7 +341,7 @@ python manage.py makemigrations
 
 For every app, it will create a migration file inside the `migration` folder.
 
-#### Performing Migrations
+### Performing Migrations
 
 Since we have done the migrations, now we have to perform the migration in order to create the database.
 
@@ -352,11 +366,11 @@ This code perform two tasks:
 
 If perform the migration and look at the migrations folder, we see the new migration file has a very tedious name. This teaches us a lesson, the two changes we are doing should not have been done in one go, in each migration we should have at most two changes.
 
-#### Reverting Migrations
+### Reverting Migrations
 
 Of course we can reverse our changes in git, however if we want to revert back to some version of the migration, we can simply do it typing the command `python manage.py migrate store 0003`. Just the migration number is good enough to perform the migration.
 
-#### Connecting to PostgresSQL
+### Connecting to PostgresSQL
 
 We have created a database migration, now perform the setup for connecting to PostgreSQL. If you have postgres installed already, it's fine. If not, please follow along till the setup.
 
@@ -416,7 +430,7 @@ operations = [
 
 When we perform migrations via `python manage.py migrate`, the first sql command will be executed. The second command will be store and will be performed if someone performs a reverse migration using the command `python manage.py migrate store 0004`.
 
-## Django ORM
+## 7. Django ORM
 
 ### 1. Managers and QuerySets
 
