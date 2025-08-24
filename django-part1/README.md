@@ -1507,35 +1507,40 @@ class ProductAdmin(admin.ModelAdmin):
 
 - Boolean and `choices` fields get useful filters automatically—just include the field name in `list_filter`.
 
-### Creating Custom Actions
+### Creating custom actions
 
-- `actions = ['clear_inventory']` tells Django admin to register an action at the top dropdown bar and look for other details to the function `clear_inventory`
-
-Let's hop into the function `clear_inventory`
+Admin **actions** let you run bulk operations on the selected rows from a changelist (via the “Action” dropdown sits at the top of the page). We will declare them on our `ModelAdmin`.
 
 ```python
-@admin.action(description='Clear inventory')
+from django.contrib import admin, messages
+from . import models
+
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    actions = ["clear_inventory"]  # show in the Action dropdown
+
+    @admin.action(description="Clear inventory")
     def clear_inventory(self, request, queryset):
-        updated_count = queryset.update(inventory=0)
+        """Set inventory to 0 for all selected products."""
+        updated = queryset.update(inventory=0)  # single bulk UPDATE
         self.message_user(
             request,
-            f'{updated_count} products were successfully updated.',
-            messages.ERROR
+            f"{updated} product(s) were successfully updated.",
+            level=messages.SUCCESS,
         )
 ```
 
-- `queryset.update(inventory=0)` allows to make the inventory update the selected inventory selections.
-- ```python
-  self.message_user(
-      request,
-      f'{updated_count} products were successfully updated.',
-      messages.SUCCESS
-      )`
-  ```
+**How this works**
 
-```
-    it sets the message for updating.
-```
+- `actions` lists method names defined on the `ModelAdmin`.
+- Action methods have the signature `(self, request, queryset)`.
+- Use `queryset.update(...)` for efficient, single‑query updates.
+- Use `self.message_user(...)` to show a success/warning/error banner. Common levels are `messages.SUCCESS`, `messages.WARNING`, and `messages.ERROR`.
+
+**Tips**
+
+- To limit who can run an action, override `has_change_permission`/`get_actions` or check `request.user` inside the action.
+- If an action needs confirmation, render and return an `HttpResponse` (e.g., a template with a confirm form) instead of redirecting immediately.
 
 ### Customizing Forms
 
