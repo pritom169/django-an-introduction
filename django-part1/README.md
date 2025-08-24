@@ -1244,26 +1244,31 @@ class CollectionAdmin(admin.ModelAdmin):
     pass
 ```
 
-### Customizing the List Pages
+### Customizing list pages
 
-Let's see another way to registering the admin.
+Registering with the decorator lets you keep the model and its admin configuration together:
 
 ```python
+from django.contrib import admin
+from . import models
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'unit_price']
-    list_editable = ['unit_price']
+    list_display = ["title", "unit_price"]
+    list_editable = ["unit_price"]  # must also appear in list_display and cannot be the first column
     list_per_page = 10
 ```
 
-- `@admin.register(models.Product)` registers Product to the admin
-- `class ProductAdmin(admin.ModelAdmin):` is a class where all the configurations will be mentioned
-- `list_display = ['title', 'unit_price']` tells django to only load the **title**, **unit_price** from the database.
-- `list_per_page` allows you to limit data on per page count basis.
+**What these options do**
 
-The Customer page has also been organized in the same manner.
+- `@admin.register(models.Product)` — registers `Product` with this `ModelAdmin`. (Equivalent to `admin.site.register(Product, ProductAdmin)`.)
+- `list_display` — columns to show in the changelist table. Defaults to just `__str__`; specify fields, callables, or model methods to add more.
+- `list_editable` — makes selected columns editable directly in the list view. Fields must also be in `list_display` and **cannot** include the first column (the one that links to the detail page).
+- `list_per_page` — paginates the changelist (defaults to 100).
 
-> In order to get a full picture of allowed admin object hop into the following [link](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-objects)
+Apply the same pattern to other models (e.g., `CustomerAdmin`) to keep your admin consistent.
+
+> Reference: Django docs — [ModelAdmin options](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-options)
 
 ### Adding Computed Column
 
