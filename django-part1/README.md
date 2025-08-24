@@ -1013,23 +1013,35 @@ c.save(update_fields=["featured_product"])  # updates only this column
 
 These approaches update just the targeted column and prevent accidental data loss.
 
-### Deleting Objects
+### Deleting objects
 
-We have seen how to read objects, how to delete objects, and now we have to know to delete objects. It is actually pretty simple in Django. Let's look at this code for a bit.
+Deleting rows is straightforward. You can delete a single instance or perform a bulk delete via a QuerySet.
 
-```python
-def say_hello(request):
-    collection = Collection(pk=11)
-    collection.delete()
-```
-
-If we want to delete multiple elements from a database table we can simply do it using filter function.
+**Delete a single row**
 
 ```python
-Collection.objects.filter(pk__gt=5)
+# Fast path: delete by primary key without fetching the row first
+Collection(pk=11).delete()
+
+# Or fetch, then delete
+collection = Collection.objects.get(pk=11)
+collection.delete()
 ```
 
-It will look into the database and delete all the element whose primary key is above 5.
+**Bulk delete**
+
+```python
+# Delete all collections with id > 5
+deleted_count, _ = Collection.objects.filter(pk__gt=5).delete()
+```
+
+`QuerySet.delete()` executes a single SQL statement and returns a tuple `(count, details)`.
+
+**Important considerations**
+
+- Deleting follows each relation’s `on_delete` rule (e.g., `CASCADE`, `PROTECT`, `SET_NULL`). A `PROTECT` will raise an error if related rows exist.
+- Bulk deletes **do not** call an overridden `Model.delete()` on each row. If you rely on custom cleanup logic, delete instances individually or move logic to signals.
+- If permanent removal isn’t desired, consider a _soft delete_ (e.g., a `is_deleted = models.BooleanField(default=False)`) and filter it out at the Manager level.
 
 ### Transactions
 
