@@ -1348,41 +1348,48 @@ class CollectionAdmin(admin.ModelAdmin):
 - `.annotate(products_count=Count("products"))` adds a per‑row aggregate using the reverse relation from `Collection`→`Product` (via `related_name='products'`).
 - `products_count()` reads the annotated value and makes it sortable via `ordering="products_count"`.
 
-### Providing
+### Adding drill‑down links from admin columns
 
-In the product count column, when we click on it, we just want to see the product which is associated with the current column.
-
-```python
-def products_count(self, collection):
-        url = (reverse('admin:store_product_changelist')
-        + '?'
-        + urlencode({
-            'collection__id': str(collection.id)
-        }))
-        return format_html('<a href="{}">{}</a>', url, collection.products_count)
-```
-
-- `reverse('admin:store_product_changelist')` get the admin page link
-- `urlencode({'collection__id': str(collection.id)}))` adds the queries in a dictionary format.
-
-### Providing Links to other pages
-
-Now we can provide links to other pages. Let's take one scenario, we want to see how many products are inside on collection.
-
-1. First we add proper reverse link, `(reverse('admin:store_product_changelist')`.
-   - The reverse link follows the following criteria. `admin:appname_propertyname_changeList`
-2. We add '?' next to the admin link just to encode more parameters afterwards
-3. Then we put the `id` just to sort them by the foreign_key
+Make computed columns actionable by turning them into links that open a filtered changelist. Example: clicking the **Products** count on a `Collection` row should open the Product changelist filtered to that collection.
 
 ```python
-url = (reverse('admin:store_product_changelist')
-        + '?'
-        + urlencode({
-            'collection__id': str(collection.id)
-        }))
+from django.contrib import admin
+from django.db.models import Count
+from django.urls import reverse
+from django.utils.html import format_html
+from urllib.parse import urlencode
+from . import models
+
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ["label", "products_count_link"]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(products_count=Count("products"))  # Product.related_name='products'
+
+    @admin.display(description="Products", ordering="products_count")
+    def products_count_link(self, obj) -> str:
+        """Link to the Product changelist filtered by this collection."""
+        url = (
+            reverse("admin:store_product_changelist")
+            + "?"
+            + urlencode({"collection__id": obj.id})  # use __exact if needed: collection__id__exact
+        )
+        return format_html('<a href="{}">{}</a>', url, obj.products_count)
 ```
 
-Here is the full code for more demonstration.
+**How it works**
+
+- `reverse("admin:store_product_changelist")` builds the URL for the Product changelist. The pattern is `admin:<app_label>_<model_name>_changelist` (both lower‑case).
+- `urlencode({...})` safely creates the query string. Admin understands field lookups in GET params; `collection__id` filters products where `collection_id = <id>` (you can also use `collection__id__exact`).
+- `format_html(...)` returns a safe HTML anchor without disabling auto‑escaping.
+
+**Tips**
+
+- If your `Product` foreign key to `Collection` is named differently (e.g., `category`), change the filter key accordingly (e.g., `category__id`).
+- To filter multiple values, pass a comma‑separated string to `__in`, e.g., `{"collection__id__in": "1,2,3"}`.
+- Adding `list_filter = ["collection"]` to `ProductAdmin` will show the same filter pre‑selected in the sidebar when the page opens.
 
 ### Adding Search to the List Page
 
