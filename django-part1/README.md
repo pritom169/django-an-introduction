@@ -185,65 +185,113 @@ When you visit `/playground/hello/`, Django renders `playground/hello.html` with
 
 ## Django Debug Toolbar
 
-In order to add django-toolbar to VS code project, hop into this [link](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html)
+The Django Debug Toolbar is a development-only panel that surfaces SQL queries, cache usage, and request/response details. In order to add django-toolbar to VS code project, hop into this [link](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html)
 
-# 2. Entity Diagram
-
-For more demonstration of django ORM (object relation mapping), we will use an e-commerce app. Please have a look at the ER diagram for more details.
-
-<img src="images-and-diagrams/er-diagram.png" alt="ER Diagram" width="80%">
-
-## 5. Organizing the project
-
-As we already know, a Django project contains different apps. Let's brainstorm a way to organize our application:
-
-1. We can put Product, Collection, Cart, CartItem, Order, OrderItem and Customer into a single app named `Store`. Befits of using this application is using anyone can download the app and install it without any hassle. However, as this app grows it gets bloated with too many models. These phenomenon is called Monolith. At some point our app becomes to hard to incorporate new features and also becomes hard to maintain. Thus, we can do better.
-
-2. We should follow the UNIX philosophy, each app should do one and one thing only. This app is better than the previous one. Let's break the app into couple of different categories. Let's break down the app in the following apps.
-
-   - **Products** (Product, Collection, Tag)
-   - **Customers** (Customer) -> Depends on Product
-   - **Carts** (Cart, CartItem) -> Depends on Customers and Products
-   - **Orders** (Order, OrderItem) -> Depends on Carts and Customers
-
-   > However, it comes with one issue. We have to install in the apps in the following sequence: Product, Customers, Carts and Orders.
-
-   > Another issue we might face, is if we change something in the product, now the Carts and Orders has to be changed accordingly.
-
-As we have see two ideas are completely polarized. If we choose monolith our projects become bloated. If we fine grain our app into many apps it become hard maintain as one app becomes dependent on others. There is a sweat spot if we look carefully. So we should give attention to these two parts:
-
-1. **Minimal Coupling:** Means they should have minimal dependencies between them.
-
-2. **High Cohesion (aka Focus):** A single app should be responsible for one functionality only.
-
-Following the two principles we can divide the app into two apps:
-
-1. Store (Product, Collection, Customer, Cart, CartItem, Order, OrderItem)
-2. Tags (Tag, TaggedItem)
-
-Hence, let's go to the terminal and create the two apps via the following command:
+### Install
 
 ```bash
-python manage.py startapp store
-python manage.py startapp tags
+pipenv install django-debug-toolbar
 ```
 
-One another responsibility comes with installing a new app that we have to include it in the `INSTALLED_APPS` of the root app inside the `settings.py`
+### Configure (settings.py)
 
 ```python
 INSTALLED_APPS = [
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "playground",
+    # Third‑party
     "debug_toolbar",
+    # Our apps
+    "playground",
     "store",
-    "tags"
+    "tags",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+
+INTERNAL_IPS = ["127.0.0.1"]  # required for the toolbar in DEBUG
+```
+
+### URLs (storefront/urls.py)
+
+```python
+from django.conf import settings
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("playground/", include("playground.urls")),
+]
+
+if settings.DEBUG:
+    urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
+```
+
+> Use the toolbar only in development. Do not enable it in production.
+
+## Entity diagram
+
+For the e‑commerce example used throughout this guide, the high‑level entity relationships are shown below.
+
+<img src="images-and-diagrams/er-diagram.png" alt="E‑commerce ER diagram" width="80%">
+
+## Organizing the project
+
+A Django **project** is composed of multiple **apps**. There are two common approaches to structuring them:
+
+- **Single “store” monolith:** All models in one app. Simple to install and reuse, but can become bloated as the domain grows.
+- **Many micro‑apps:** Very focused apps (Products, Customers, Carts, Orders). High focus, but introduces cross‑app dependencies and migration coupling.
+
+A pragmatic middle ground is:
+
+- **store** — `Product`, `Collection`, `Customer`, `Cart`, `CartItem`, `Order`, `OrderItem`
+- **tags** — `Tag`, `TaggedItem` (generic tagging via `contenttypes`)
+
+This balances **high cohesion** (each app has a clear purpose) with **low coupling** (minimal cross‑app references).
+
+Create the apps:
+
+```bash
+python manage.py startapp store
+python manage.py startapp tags
+```
+
+Add them to `INSTALLED_APPS` in `settings.py`:
+
+```python
+INSTALLED_APPS = [
+    # Django
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # Third‑party
+    "debug_toolbar",
+    # Our apps
+    "playground",
+    "store",
+    "tags",
 ]
 ```
+
+Note that Django’s migration framework tracks inter‑app dependencies automatically; you don’t need to “install” apps in a strict order, but you should keep related models together to avoid unnecessary coupling.
 
 ## 6. Models
 
