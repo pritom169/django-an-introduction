@@ -101,38 +101,37 @@ This scaffolds the `playground/` package with these key modules:
 
 HTTP is a request–response protocol. In Django, a _view_ is a callable (function‑based or class‑based) that takes an `HttpRequest` and returns an `HttpResponse` (or raises an exception such as `Http404`). In other words, it’s the request handler that contains your application logic and decides what to render, redirect, or return as JSON.
 
-### Url Configuration
+### URL configuration
 
-When we want to configure the urls, it should starts with the app. Please note, we don't call the function we just mention the name of it without using '()'
+Defining app‑level routes in `playground/urls.py` and including them from the project’s root `urls.py`.
+
+**playground/urls.py**
 
 ```python
 from django.urls import path
 from . import views
 
-# URLConf
 urlpatterns = [
-    path('playground/hello', views.say_hello)
+    # Pass the view callable itself—no parentheses.
+    path("hello/", views.say_hello, name="playground-hello"),
 ]
 ```
 
-We have declared the URL in the `playground` app. However, the project does not know the route yet. Hence, it order to let it know, we have to add it into the `urls.py` of the main project.
+**storefront/urls.py**
 
 ```python
+from django.contrib import admin
+from django.urls import path, include
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('playground/', include('playground.urls'))
+    path("playground/", include("playground.urls")),
 ]
 ```
 
-What is essentially tells, django when any request comes with 'playground', navigate it to the urls of playground app.
+With this setup, a request to `/playground/hello/` is dispatched to `views.say_hello`.
 
-In django, every url must end with a '/' and since`playground` has already been mentioned into the `urls.py` of the main app.
-
-```python
-urlpatterns = [
-    path('hello/', views.say_hello)
-]
-```
+By convention, Django projects use trailing slashes (e.g., `"hello/"`). If slash is omitted, we have to be aware the default `APPEND_SLASH` behavior may redirect `/hello` to `/hello/` via `CommonMiddleware`.
 
 ## Templates
 
