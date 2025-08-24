@@ -524,30 +524,49 @@ python manage.py migrate store zero
 
 Use `--plan` to preview changes, and `--fake` only for exceptional cases when the database already matches the desired state.
 
-### Connecting to PostgresSQL
+### Connecting to PostgreSQL
 
-We have created a database migration, now perform the setup for connecting to PostgreSQL. If you have postgres installed already, it's fine. If not, please follow along till the setup.
+Set up a local PostgreSQL instance and create a database/user for the project.
 
-1. Install postgresql through this command `brew install postgresql`. We will install brew as our package manager.
-2. Let's gets inside the postgres console. We can simply do that via performing `pspl postgres`
-3. Since we are inside the postgres command console, we will perform some operation.
-   ```bash
-   CREATE USER myuser WITH PASSWORD 'mypassword';
-   ALTER USER myuser CREATEDB;
-   CREATE DATABASE storefront OWNER myuser;
-   GRANT ALL PRIVILEGES ON DATABASE storefront TO myuser;
-   ```
-4. After we can get out of postgres command console by typing `\q``
+#### Install & start (macOS/Homebrew)
 
-Since we have postgres installed, now we need a GUI. We will use the following credentials to connect to pgadmin4
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+```
 
-4. Once those details are entered and test connection succeeds, we are ready.
+> If you already have PostgreSQL installed, you can skip the install step. On Linux, use your package manager (e.g., `apt install postgresql`) and on Windows use the official installer.
+
+#### Create role and database
+
+Open the PostgreSQL shell and create a user and database:
+
+```bash
+psql -d postgres
+```
+
+Then run:
+
+```sql
+CREATE ROLE myuser WITH LOGIN PASSWORD 'mypassword';
+ALTER ROLE myuser CREATEDB;
+CREATE DATABASE storefront OWNER myuser;
+GRANT ALL PRIVILEGES ON DATABASE storefront TO myuser;
+```
+
+Exit with `\q`.
+
+> Optional GUI: connect with pgAdmin/TablePlus using: **Host** `localhost`, **Port** `5432`, **Database** `storefront`, **User** `myuser`, **Password** `mypassword`.
 
 ### Using PostgreSQL in Django
 
-In order to connect to Postgresql, we need the following library. We can install it by typing `pip install psycopg2-binary`.
+Install the PostgreSQL driver (psycopg 3):
 
-Now inside settings.py in DATABASES section, we have to include the following details
+```bash
+pipenv install "psycopg[binary]>=3.1"
+```
+
+Configure `DATABASES` in `settings.py` (reading from environment variables is recommended):
 
 ```python
 DATABASES = {
@@ -562,27 +581,51 @@ DATABASES = {
 }
 ```
 
-Once we have installed the packages and the proper database setting has been done, we can go forward and type `python manage.py migrate`. Once databases are successfully migrated we can go to pgadmin4 console and refresh the database.
+Apply migrations to create tables in PostgreSQL:
 
-#### Running Custom SQL
-
-Let's assume for a task we need to perform SQL operation. For that we will create a empty migration file via `python manage.py makemigrations store --empty`. The file will be stored in the `migrations` folder.
-
-In the migration file, inside the operations array we write this sql command.
-
-```python
-operations = [
-    migrations.RunSQL("""
-        INSERT INTO store_collection (label)
-        VALUES ('collection1')
-    """, """
-        DELETE FROM store_collection
-        WHERE label='collection1'
-    """)
-]
+```bash
+python manage.py migrate
 ```
 
-When we perform migrations via `python manage.py migrate`, the first sql command will be executed. The second command will be store and will be performed if someone performs a reverse migration using the command `python manage.py migrate store 0004`.
+### Running custom SQL via migrations
+
+Create an empty migration and add SQL to it:
+
+```bash
+python manage.py makemigrations store --empty --name seed_initial_collection
+```
+
+In the generated file, add a `RunSQL` operation with forward and reverse SQL:
+
+```python
+from django.db import migrations
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ("store", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.RunSQL(
+            sql="""
+                INSERT INTO store_collection (label)
+                VALUES ('collection1');
+            """,
+            reverse_sql="""
+                DELETE FROM store_collection
+                WHERE label = 'collection1';
+            """,
+        ),
+    ]
+```
+
+Run it:
+
+```bash
+python manage.py migrate
+```
+
+The forward SQL runs on migrate; the `reverse_sql` runs if you roll back the migration.
 
 ## 7. Django ORM
 
