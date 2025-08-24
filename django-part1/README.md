@@ -135,9 +135,53 @@ By convention, Django projects use trailing slashes (e.g., `"hello/"`). If slash
 
 ## Templates
 
-As we have already known views in django are not views exactly. Templates are the real views in django. Let's create a **templates** folder inside the migrations folder. Let's write `<h1>Hello World!</h1>` inside the folder.
+Django uses the template system to generate HTML (or any text) from your view logic.
 
-> When rendering a template, the django app looks for the `hello.html` inside the the template folder of the `playground` app. If it's there, it renders it accordingly.
+### Where to put templates
+
+Use either app‑local templates or a project‑level templates directory:
+
+- **App‑local (recommended & self‑contained):** `playground/templates/playground/hello.html`
+- **Project‑level:** `templates/hello.html` (enable `TEMPLATES[0]["DIRS"]` in `settings.py`)
+
+With the default `APP_DIRS=True`, Django automatically finds templates inside each app’s `templates/` folder.
+
+**settings.py (optional project‑level directory)**
+
+```python
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],  # project‑level templates
+        "APP_DIRS": True,
+        "OPTIONS": {"context_processors": [...]},
+    },
+]
+```
+
+### Minimal example
+
+**playground/views.py**
+
+```python
+from django.shortcuts import render
+
+def say_hello(request):
+    return render(request, "playground/hello.html", {"name": "World"})
+```
+
+**playground/templates/playground/hello.html**
+
+```html
+<h1>Hello {{ name }}!</h1>
+```
+
+When you visit `/playground/hello/`, Django renders `playground/hello.html` with the provided context.
+
+> Note: Do **not** put templates inside the `migrations/` folder.
 
 ## Django Debug Toolbar
 
