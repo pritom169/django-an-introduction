@@ -52,11 +52,13 @@ pipenv run django-admin startproject storefront .
 
 ### Opening the Shell
 
-Activating the virtual environment we previously created is the standard way to go.
+Activate the project’s virtual environment in a dedicated subshell:
 
 ```bash
 pipenv shell
 ```
+
+To exit, type `exit`. For one‑off commands without activating a subshell, use `pipenv run <command>`.
 
 ### Runing the server
 
