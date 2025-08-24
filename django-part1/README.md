@@ -1320,21 +1320,33 @@ class ProductAdmin(admin.ModelAdmin):
 
 Use `list_select_related` for **ForeignKey/OneToOne** relations. For **ManyToMany** or reverse FK relations, prefer `prefetch_related()` (see the ORM section on selecting related objects efficiently).
 
-### Overriding the Base QuerySet
+### Overriding the base queryset
 
-In we can get the base querySet that Django Admin uses to fetch via
+Use `get_queryset()` on a `ModelAdmin` to add annotations/joins or apply default filters for the changelist.
 
 ```python
-def get_queryset(self, request):
-    return super().get_queryset(request).annotate(
-        products_count = Count('product')
-    )
+from django.contrib import admin
+from django.db.models import Count
+from . import models
+
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ["label", "products_count"]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(products_count=Count("products"))  # reverse FK from Product.related_name='products'
+
+    @admin.display(ordering="products_count", description="Products")
+    def products_count(self, obj) -> int:
+        return obj.products_count
 ```
 
-get_queryset(self, request) overrides the base queryset that Django Admin uses to fetch rows for the changelist.
+**What’s happening**
 
-- By default, super().get_queryset(request) returns a plain queryset of the model (Collection.objects.all() with admin filters/permissions applied).
-- .annotate(products_count=Count('product')), so every Collection row comes with an extra computed column (products_count).
+- `super().get_queryset(request)` returns the base queryset (with admin-level filters/permissions applied).
+- `.annotate(products_count=Count("products"))` adds a per‑row aggregate using the reverse relation from `Collection`→`Product` (via `related_name='products'`).
+- `products_count()` reads the annotated value and makes it sortable via `ordering="products_count"`.
 
 ### Providing
 
