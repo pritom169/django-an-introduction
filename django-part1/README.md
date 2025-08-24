@@ -80,22 +80,22 @@ If you’re using Pipenv without activating a subshell, prefix commands with `pi
 pipenv run python manage.py runserver
 ```
 
-## Creation of the Apps
+## Create the first app
 
-In the directory the django project was created, we will type the command
+From the project root, create a new Django app named `playground`:
 
 ```bash
 python manage.py startapp playground
 ```
 
-It will create an app with playground. Inside the app we can see multiple files. Let's go one by one to describe their responsiblities
+This scaffolds the `playground/` package with these key modules:
 
-1. The `migrations` folder is responsible for generating database tables. More about this in the future section.
-2. In the `admin.py` we declare how the admin inteface is going to look like for this app.
-3. The `apps.py` is where we configure the app.
-4. In the `models.py` we pull out data from the database to show to user.
-5. Test module is where we write our tests.
-6. Views is responsible for request handler.
+1. `migrations/` — auto‑generated files that track schema changes and create/update database tables.
+2. `admin.py` — configuration for how this app’s models appear and behave in the Django admin.
+3. `apps.py` — app configuration (metadata, ready hooks, etc.).
+4. `models.py` — model classes that define the database schema and ORM behavior.
+5. `tests.py` — automated tests for the app.
+6. `views.py` — request handlers (function‑based or class‑based views) that return responses.
 
 ## Views
 
