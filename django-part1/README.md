@@ -953,44 +953,65 @@ qs[0]         # hits the DB (no cache yet)
 list(qs)      # now hits the DB again to load the full result set
 ```
 
-### Creating Objects
+### Creating objects
 
-What we have already done, is querying data. However, we have not entered data. However we can do it using the following command
+Use the ORM to insert rows via one of these patterns:
+
+- **Instance + `save()`**
+- **Manager shortcut `Model.objects.create(...)`**
+- **`bulk_create([...])`** for many rows
+- **`get_or_create()`** to avoid duplicates under a unique constraint
+
+**Example: create a `Collection` with a featured product**
 
 ```python
+from django.shortcuts import render
+from store.models import Collection, Product
+
 def say_hello(request):
-    collection = Collection()
-    collection.title = 'Video Games'
-    collection.featured_product = Product.objects.get(pk=1)
-    collection.save()
+    # Load the product we want to feature
+    product = Product.objects.get(pk=1)
 
-    return render(request, 'hello.html', {'name': 'Pritom'})
+    # Create the collection (use featured_product_id=1 to skip the extra query)
+    collection = Collection.objects.create(
+        label="Video Games",
+        featured_product=product,
+    )
+
+    return render(request, "playground/hello.html", {"name": "Pritom"})
 ```
 
-We first introduce the collection. Afterwards we select the title and we add the featured product to primary key 1. Afterward we save the collection.
+---
 
-Now for some reason, we don't want to update the title. We just want to update the product_key. If we do that, and look at the SQL command we will see, the title is being set to empty string and that we don't want. It is causing Data loss.
+#### Updating a single field safely (avoid unintended overwrites)
 
-```sql
-UPDATE "store_collection"
-   SET "title" = '',
-       "featured_product_id" = NULL
- WHERE "store_collection"."id" = 11
-```
+Don’t instantiate a bare model with only a primary key and call `save()` without telling Django which fields changed—unspecified fields may be written with empty/default values. Use one of the safe patterns below.
 
-The main reason of this issue is Django automatically adds `collection.title = ''`. However we can solve it by using by first reading it from the database and then updating it.
+**Option 1 — fetch, modify, and save only the changed fields**
 
 ```python
 collection = Collection.objects.get(pk=11)
 collection.featured_product = None
-collection.save()
+collection.save(update_fields=["featured_product"])  # writes just this column
 ```
 
-You might argue, this extra reading may cause performance issues. However, it is the simplest way to implement it in the code. However, we can do that by using the keyword argument.
+**Option 2 — update via QuerySet (single SQL statement, no initial read)**
 
 ```python
 Collection.objects.filter(pk=11).update(featured_product=None)
 ```
+
+**Option 3 — save a stub instance with `update_fields`**
+
+```python
+c = Collection(pk=11)
+# If you already know the FK id, you can set it directly:
+# c.featured_product_id = None
+c.featured_product = None
+c.save(update_fields=["featured_product"])  # updates only this column
+```
+
+These approaches update just the targeted column and prevent accidental data loss.
 
 ### Deleting Objects
 
