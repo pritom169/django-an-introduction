@@ -1270,21 +1270,29 @@ Apply the same pattern to other models (e.g., `CustomerAdmin`) to keep your admi
 
 > Reference: Django docs — [ModelAdmin options](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#modeladmin-options)
 
-### Adding Computed Column
+### Adding a computed column
 
-Now for knowing the current status of the inventory, we may need another computer field to add. Let's assume we want to label all those inventories that has less than 10 products.
+You can add a derived/read‑only column to the changelist by defining a method on your `ModelAdmin` and including it in `list_display`.
 
-- First we will add the following function into the code
+```python
+from django.contrib import admin
+from . import models
 
-  ```python
-  def inventory_status(self, product):
-      if product.inventory < 10:
-          return 'Low'
-      return 'OK'
-  ```
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ["title", "unit_price", "inventory_status"]
 
-- Then we will add function name (inventory_status) to the `list_display`
-- However, it is not sortable. We can add sorting by adding the decorator `@admin.display(ordering='inventory')` on top of `inventory_status` function.
+    @admin.display(description="Inventory", ordering="inventory")
+    def inventory_status(self, obj) -> str:
+        """Show a simple stock indicator based on the inventory level."""
+        return "Low" if obj.inventory < 10 else "OK"
+```
+
+**Notes**
+
+- Methods used in `list_display` receive the model instance (`obj`) and must return a string, number, boolean, or HTML (use `format_html`).
+- `@admin.display(description=..., ordering=...)` sets the column label and enables sorting by a real field (`inventory` here).
+- For complex values (e.g., badges), return `format_html(...)`. For expensive calculations, annotate them in `get_queryset()` and read the annotated value in the display method.
 
 ### Selecting Related Objects
 
