@@ -1159,22 +1159,30 @@ Tips:
 
 ## Making an Admin Site
 
-### Setting Up the Admin Site
+### Access
 
-As we know every Django project comes with an admin site. We can access the admin site using the link `http://localhost:8000/admin/`. In order to access the admin site we need to create a super user.
-
-We can create a super user by the following command.
+Django includes a built‑in admin at `/admin/`. Create a superuser to sign in:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-However, we can perform even more modification. We can change the header and the index title using the following code inside `storefront/urls.py`
+### Basic branding
+
+Set the admin site's title and headers once at startup. It's clearer to keep this in an admin module (e.g., `storefront/admin.py`) so the branding lives next to the rest of your admin configuration:
 
 ```python
-admin.site.site_header = 'Storefront Admin'
-admin.site.index_title = 'Admin'
+from django.contrib import admin
+
+admin.site.site_title = "Storefront Admin"
+administrator
+admin.site.site_header = "Storefront Administration"
+admin.site.index_title = "Dashboard"
 ```
+
+> You can also set these in `storefront/urls.py`, but keeping them in `admin.py` is cleaner and avoids surprising side‑effects.
+
+````
 
 ### Registering Models
 
@@ -1182,7 +1190,7 @@ In order to register for models, we need to go the `admin.py` file and register 
 
 ```python
 admin.site.register(models.Collection)
-```
+````
 
 After registering the models if we go to the admin panel we will see all the collections. However the collections will be represented a more vague format. We will see a list sort of like this one
 
