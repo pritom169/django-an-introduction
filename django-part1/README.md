@@ -1294,17 +1294,31 @@ class ProductAdmin(admin.ModelAdmin):
 - `@admin.display(description=..., ordering=...)` sets the column label and enables sorting by a real field (`inventory` here).
 - For complex values (e.g., badges), return `format_html(...)`. For expensive calculations, annotate them in `get_queryset()` and read the annotated value in the display method.
 
-### Selecting Related Objects
+### Selecting related objects
 
-When it comes to selecting related fields, we can do it in a certain way to make it bit more performance efficient.
+Avoid N+1 queries when showing related fields in the admin by joining single‑valued relations up front.
 
-- First we will preload the necessary table for adding related tables. We will pre load all the collection that the product belongs to via `list_select_related = ['collection']`
-- We will get the collection title, via the following command
-  ```python
-  def collection_title(self, product):
-      return product.collection.title
-  ```
-- After that, we will add the collection_title into `list_display` array.
+```python
+from django.contrib import admin
+from . import models
+
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ["title", "collection_title", "unit_price"]
+    list_select_related = ["collection"]  # join Collection for one query
+
+    @admin.display(description="Collection", ordering="collection__title")
+    def collection_title(self, obj) -> str:
+        return obj.collection.title
+```
+
+**Why this helps**
+
+- `list_select_related` applies `select_related("collection")` to the admin queryset, preventing one extra query per row (the classic N+1 issue).
+- `collection_title` renders a readable column from the related `Collection`.
+- `ordering="collection__title"` enables sorting by the related field.
+
+Use `list_select_related` for **ForeignKey/OneToOne** relations. For **ManyToMany** or reverse FK relations, prefer `prefetch_related()` (see the ORM section on selecting related objects efficiently).
 
 ### Overriding the Base QuerySet
 
