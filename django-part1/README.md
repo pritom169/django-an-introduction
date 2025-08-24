@@ -1045,55 +1045,54 @@ deleted_count, _ = Collection.objects.filter(pk__gt=5).delete()
 
 ### Transactions
 
-Let's assume we want to add an orderItem. Now without Order we can not import OrderItem. First we need to create an Order and OrderItem will use that value to create an OrderItem.
+Use transactions to ensure related writes either **all succeed** or **all roll back**. In Django, wrap write operations in `transaction.atomic()`.
+
+**Example: create an `Order` and its `OrderItem` atomically**
 
 ```python
-def say_hello(request):
-    order = Order()
-    order.customer_id = 1
-    order.save()
+from django.db import transaction
+from store.models import Order, OrderItem, Product
 
-    item = OrderItem()
-    item.order = order
-    item.product_id = 1
-    item.quantity = 1
-    item.unit_price = 10
-    item.save()
+@transaction.atomic
+def create_order(customer_id: int, product_id: int, qty: int = 1):
+    # All DB writes in this function are atomic
+    order = Order.objects.create(customer_id=customer_id)
+
+    # Load the product (optionally lock it if you also adjust inventory)
+    product = Product.objects.get(pk=product_id)
+    OrderItem.objects.create(
+        order=order,
+        product=product,
+        quantity=qty,
+        unit_price=product.unit_price,
+    )
 ```
 
-Since it is a sequential order, in other words, if for some part fails in creating the Order and OrderItem, the other part will be inconsistent. As a result, we have to make sure the one part fails, the whole operation should be rolled back. We can exactly do that by the help of Transactions.
-
-We can wrap a whole function inside a Transaction by using `@transaction.atomic()` decorator.
+**Block‑scoped transaction**
 
 ```python
-@transaction.atomic()
-def say_hello(request):
-    order = Order()
-    order.customer_id = 1
-    order.save()
+from django.db import transaction
 
-    item = OrderItem()
-    item.order = order
-    item.product_id = 1
-    item.quantity = 1
-    item.unit_price = 10
-    item.save()
+def say_hello(request):
+    with transaction.atomic():
+        order = Order.objects.create(customer_id=1)
+        OrderItem.objects.create(order=order, product_id=1, quantity=1, unit_price=10)
 ```
 
-Now let's assume we want to enclose certain part of the the code inside a function into the transaction. We can do that using `with transaction.atomic()``
+**Good to know**
+
+- Any **exception** raised inside an `atomic` block rolls back all queries in that block.
+- The decorator form wraps the whole function; the context‑manager form lets you scope a smaller section.
+- Nested `atomic()` blocks create **savepoints**; raising an exception rolls back to the **nearest** `atomic()`.
+- If you need to run side effects **only after a successful commit** (e.g., send an email), use `transaction.on_commit`:
 
 ```python
-with transaction.atomic():
-    order = Order()
-    order.customer_id = 1
-    order.save()
+from django.db import transaction
 
-    item = OrderItem()
-    item.order = order
-    item.product_id = 1
-    item.quantity = 1
-    item.unit_price = 10
-    item.save()
+def create_and_notify(...):
+    with transaction.atomic():
+        order = Order.objects.create(...)
+    transaction.on_commit(lambda: send_order_email(order.id))
 ```
 
 ### Executing RAW SQL queries
