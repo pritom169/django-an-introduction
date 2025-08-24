@@ -1097,14 +1097,65 @@ def create_and_notify(...):
 
 ### Executing RAW SQL queries
 
-Sometimes we can not implement some complex queries with Django ORM. As it would lead us to writing convoluted queries. In addition, the SQL query will be much more performance efficient.
+The ORM covers most use‑cases, but sometimes raw SQL is clearer or faster (e.g., complex joins, CTEs, window functions, vendor‑specific features). When you drop down to SQL, **always parameterize** inputs to avoid SQL injection.
+
+#### Option 1 — `Model.objects.raw()`
+
+Returns model instances from a raw SELECT. Your query **must include the primary key** column as `id` (or alias it to `id`).
 
 ```python
-def say_hello(request):
-    queryset = Product.objects.raw('SELECT * FROM store_product')
+from django.shortcuts import render
+from store.models import Product
 
-    return render(request, 'hello.html', {'name': 'Pritom', 'result': list(queryset)})
+def say_hello(request):
+    products = Product.objects.raw(
+        """
+        SELECT id, title, description, unit_price, inventory, last_update, collection_id
+        FROM store_product
+        WHERE unit_price > %s
+        ORDER BY unit_price DESC
+        LIMIT 20
+        """,
+        [20],  # parameters are safely bound by the DB driver
+    )
+    return render(request, "playground/hello.html", {"name": "Pritom", "products": list(products)})
 ```
+
+Notes:
+
+- The result is a lazy iterable of **read‑only** model instances.
+- Only `SELECT` is supported here (no INSERT/UPDATE/DELETE).
+
+#### Option 2 — `connection.cursor()`
+
+Use a DB cursor for arbitrary SQL and manual row handling.
+
+```python
+from decimal import Decimal
+from django.db import connection
+
+def expensive_products(min_price: Decimal = Decimal("20.00")):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id, title, unit_price
+            FROM store_product
+            WHERE unit_price > %s
+            ORDER BY unit_price DESC
+            LIMIT 20
+            """,
+            [min_price],
+        )
+        rows = cursor.fetchall()
+    # Map tuples to dicts for convenient use in templates/JSON
+    return [{"id": r[0], "title": r[1], "unit_price": r[2]} for r in rows]
+```
+
+Tips:
+
+- Wrap multiple write statements in `transaction.atomic()`.
+- Prefer migrations for schema changes; raw SQL in code should be **data** queries, not DDL.
+- Keep raw SQL localized (utility functions) and covered by tests to catch dialect changes.
 
 ## Making an Admin Site
 
