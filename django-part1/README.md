@@ -293,22 +293,24 @@ INSTALLED_APPS = [
 
 Note that Django’s migration framework tracks inter‑app dependencies automatically; you don’t need to “install” apps in a strict order, but you should keep related models together to avoid unnecessary coupling.
 
-## 6. Models
+## Models
 
-When creating a model, we put considerations into two details.
+When defining Django models, think about two things:
 
-1. Field types (comes after calling `models`)
-2. Field options (declared inside parenthesis)
+1. **Field types** Comes after the `=` sign (e.g., `CharField`, `DecimalField`, `DateTimeField`).
+2. **Field options** Comes the parenthesis `()` (arguments like `max_length`, `null`, `blank`, `choices`, and `validators`).
 
-Here is the models class for `models.py`
+Example `Product` model:
 
 ```python
+from django.db import models
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.IntegerField()
-    last_update = models.DateTimeField(auto_now=True)
+    description = models.TextField(blank=True)  # optional in forms/admin
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    inventory = models.PositiveIntegerField()
+    last_update = models.DateTimeField(auto_now=True)  # updated on each save
 ```
 
 ### Choice Fields
