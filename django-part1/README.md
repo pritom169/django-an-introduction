@@ -60,14 +60,24 @@ pipenv shell
 
 To exit, type `exit`. For one‑off commands without activating a subshell, use `pipenv run <command>`.
 
-### Runing the server
+### Running the development server
 
-If we run the command `django-admin runserver`, it will not run as django-admin does not know which project to run. Instead all the necessary commands needed to run the server are inside the `manage.py` (It was generated when we created the project).
-
-Hence we can run the project using
+Use the project’s `manage.py` to start Django so it knows which settings to load.
 
 ```bash
 python manage.py runserver
+```
+
+By default this serves at http://127.0.0.1:8000/ (press Ctrl+C to stop). To bind to all interfaces or a different port:
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
+If you’re using Pipenv without activating a subshell, prefix commands with `pipenv run`:
+
+```bash
+pipenv run python manage.py runserver
 ```
 
 ## Creation of the Apps
