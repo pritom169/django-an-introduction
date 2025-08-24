@@ -1182,64 +1182,67 @@ admin.site.index_title = "Dashboard"
 
 > You can also set these in `storefront/urls.py`, but keeping them in `admin.py` is cleaner and avoids surprising side‑effects.
 
-````
+### Registering models
 
-### Registering Models
-
-In order to register for models, we need to go the `admin.py` file and register the models. If we want to register the Collection model, we can simply do that using
+To make a model appear in the Django admin, register it in the app’s `admin.py`.
 
 ```python
-admin.site.register(models.Collection)
-````
+from django.contrib import admin
+from . import models
 
-After registering the models if we go to the admin panel we will see all the collections. However the collections will be represented a more vague format. We will see a list sort of like this one
+admin.site.register(models.Collection)
+```
+
+After registration, the changelist will show your `Collection` rows. By default, Django renders objects as generic labels like:
 
 ```
 Collection object (10)
 Collection object (9)
-Collection object (8)
-Collection object (7)
-Collection object (6)
-Collection object (5)
-Collection object (4)
-Collection object (3)
-Collection object (2)
+...
 Collection object (1)
 ```
 
-However, this is not very meaningful as looking at it we are not understanding anything. However, we can change by adding a very simple function. The function would be
+Provide a meaningful label by implementing `__str__` on the model:
 
 ```python
-def __str__(self):
-    return self.title
+from django.db import models
+
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
+    # … other fields …
+
+    def __str__(self) -> str:
+        return self.title
 ```
 
-- **str** is a special Python method that defines the human-readable string representation of an object.
-- Inside the function we will return the title.
+Now the admin will display the collection title (e.g., `Grocery`, `Toys`, `Magazines`) instead of `Collection object (…)`.
 
-Now we see the following collection
-
-```
-Magazines
-Toys
-Spices
-Baking
-Pets
-Stationary
-Cleaning
-Beauty
-Grocery
-Flowers
-```
-
-If we want the titles to to come in sorted manner, we can implement them by including a Meta class. Inside the meta class we can include stuffs like ordering, table name, and indexes. Here we are only concerned with the ordering.
+Optionally, define a default sort order so items appear alphabetically:
 
 ```python
-class Meta:
-    ordering = ['title']
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
+    # … other fields …
+
+    class Meta:
+        ordering = ["title"]
 ```
 
-Likewise we can implement the same collection addition, and the title ordering just by including collection.
+**Notes**
+
+- `__str__` defines the human‑readable representation across your project (admin lists, dropdowns, logs, etc.).
+- `Meta.ordering` sets the default `ORDER BY` for queries. The admin respects it unless you specify `ordering` on a `ModelAdmin`.
+
+**Alternative registration (decorator)**
+
+```python
+from django.contrib import admin
+from . import models
+
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    pass
+```
 
 ### Customizing the List Pages
 
