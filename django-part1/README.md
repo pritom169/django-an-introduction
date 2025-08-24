@@ -99,7 +99,7 @@ This scaffolds the `playground/` package with these key modules:
 
 ## Views
 
-HTML is a request response protocol. These is where we use views in Django. In a nutshell, a view function takes a request and returns a response. More accurately it's request handler.
+HTTP is a request–response protocol. In Django, a _view_ is a callable (function‑based or class‑based) that takes an `HttpRequest` and returns an `HttpResponse` (or raises an exception such as `Http404`). In other words, it’s the request handler that contains your application logic and decides what to render, redirect, or return as JSON.
 
 ### Url Configuration
 
