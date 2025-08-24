@@ -695,370 +695,263 @@ If we want to see, if a product exists or not, we can simply do it by using `exi
 product_exists = Product.objects.filter(pk=0).exits()
 ```
 
-### Filtering Objects
+### 3. Filtering objects
 
-Let's talk about filtering objects. If we want to filter products who price is greater than 20, we can write some filter code.
+Use **field lookups** in `filter()` to express conditions. Common operators:
 
-```python
-queryset = Product.objects.filter(unit_price__gt=20)
-```
-
-For getting a range of product
+- `__gt`, `__gte`, `__lt`, `__lte` — greater/less than
+- `__range` — inclusive range
+- `__contains` / `__icontains` — substring (case‑sensitive/insensitive)
 
 ```python
-queryset = Product.objects.filter(unit_price__range=(20, 30))
+# Price > 20
+qs = Product.objects.filter(unit_price__gt=20)
+
+# 20 ≤ price ≤ 30
+qs = Product.objects.filter(unit_price__range=(20, 30))
+
+# Title contains "coffee" (case‑insensitive)
+qs = Product.objects.filter(title__icontains="coffee")
 ```
 
-For getting a product with a specific name is also possible.
+See the official docs for all lookups.
+
+#### Combining conditions
+
+Multiple conditions can be combined in one `filter()` or chained; both are ANDed:
 
 ```python
-queryset = Product.objects.filter(title__contains='coffee')
+qs = Product.objects.filter(inventory__lt=10, unit_price__lt=20)
+qs = Product.objects.filter(inventory__lt=10).filter(unit_price__lt=20)
 ```
 
-Now this query is case sensitive. If want to make it case insensitive we can also do it using
+### 4. Complex lookups with `Q`
+
+Use `Q` objects for OR and NOT logic.
 
 ```python
-queryset = Product.objects.filter(title__icontains='coffee')
+from django.db.models import Q
+
+# inventory < 10 OR unit_price < 20
+qs = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
+
+# inventory < 10 AND NOT (unit_price < 20)
+qs = Product.objects.filter(Q(inventory__lt=10) & ~Q(unit_price__lt=20))
 ```
 
-For more more queries please hop into the office [documentation](https://docs.djangoproject.com/en/5.2/ref/models/querysets/#field-lookups)
+### 5. Field‑to‑field comparisons with `F`
 
-#### Filtering Multiple queries
-
-When we want to put multiple conditions inside we can do it two way
-
-1. Putting all the conditions inside the parenthesis and separating them with comma
-2. We can also chain them.
+Use `F` expressions to compare/update using other field values at the database level.
 
 ```python
-queryset = Product.objects.filter(inventory__lt=10, unit_price__lt=20)
-queryset = Product.objects.filter(inventory__lt=10).filter(unit_price__lt=20)
+from django.db.models import F
+
+# Example: inventory equals the rounded unit price (illustrative)
+qs = Product.objects.filter(inventory=F("inventory"))
 ```
 
-### Complex Lookups Using Q Objects
+### 6. Ordering
 
-If we want to get queries a bit more complex, we need to use Q objects. Let's look at queries.
-
-1. Filter the products where inventory < 10 OR price < 20
+Use `order_by()`; a leading `-` sorts descending. `reverse()` flips the current ordering.
 
 ```python
-queryset = Product.objects.filter(Q(inventory__lt=10) | Q(unit_price__lt=20))
+qs = Product.objects.order_by("unit_price")
+qs = Product.objects.order_by("unit_price", "-title")
+qs = Product.objects.order_by("unit_price", "-title").reverse()
 ```
 
-2. Product where inventory < 10 OR not price < 20
+### 7. Limiting results
+
+Slice the QuerySet (SQL `LIMIT`/`OFFSET`):
 
 ```python
-queryset = Product.objects.filter(Q(inventory__lt=10) | ~Q(unit_price__lt=20))
+qs = Product.objects.order_by("unit_price", "-title")[:5]
 ```
 
-### Reference Fields using F Objects
+### 8. Selecting specific fields
 
-If we want to compare a variable with another variable inside the filter. Say we want to compare the if inventory = price
+`values()` returns dicts; `values_list()` returns tuples. Use double‑underscore to traverse relations.
 
 ```python
-queryset = Product.objects.filter(inventory=F('unit_price'))
+# Dicts with id and title
+qs = Product.objects.values("id", "title")
+
+# Include a related field from Collection
+qs = Product.objects.values("id", "title", "collection__title")
+
+# Tuples
+qs = Product.objects.values_list("id", "title")
+
+# Single column as a flat list
+ids = Product.objects.values_list("id", flat=True)
 ```
 
-### Sorting
-
-If we want to perform some sorting. We can do them using,
+**Exercise:** products that appear in orders, sorted by title
 
 ```python
-queryset = Product.objects.order_by('title') ## Sorting by product title
-queryset = Product.objects.order_by('unit_price', '-title')
-## Sorting by unit_price in ascending order
-## Sorting by title in descending order
-queryset = Product.objects.order_by('unit_price', '-title').reverse()
-# Reversing the order
+ids = OrderItem.objects.values_list("product_id", flat=True).distinct()
+qs = Product.objects.filter(id__in=ids).order_by("title")
 ```
 
-### Limiting Results
+### 9. Deferring fields
 
-Now let's assume we want to limit the result by 5.
+Load only what you need with `only()` or exclude with `defer()`:
 
 ```python
-queryset = Product.objects.order_by('unit_price', '-title')[:5]
+qs = Product.objects.only("id", "title")
+qs = Product.objects.defer("description")
 ```
 
-### Selecting Fields Query
+Be careful: accessing a deferred field later triggers an extra query **per row** (N+1 behavior).
 
-If we want to get specific fields, we can simply do it by selecting values inside the quotation mark.
+### 10. Selecting related objects efficiently
+
+- Use `select_related()` for single‑valued relations (FK/OneToOne) — SQL join.
+- Use `prefetch_related()` for multi‑valued relations (ManyToMany/reverse FK) — separate query + Python join.
 
 ```python
-queryset = Product.objects.values('id', 'title')
+# Product with its Collection (FK) and Promotions (M2M)
+qs = (
+    Product.objects
+    .select_related("collection")
+    .prefetch_related("promotions")
+)
 ```
 
-When we want to get something that involves multiple database tables. Let's assume we want to get the collection id in which the collection belongs.
-
-```python
-queryset = Product.objects.values('id', 'title', 'collection__title')
-```
-
-If we want to get the same data in a tuple format without mentioning the fields name, we can use `values_list`
-
-```python
-queryset = Product.objects.values_list('id', 'title', 'collection_title')
-```
-
-Now take a complex query. Let's perform one exercise. We need to sort product that have been ordered, and we can sort them by their title.
-
-```python
-# We first need to sort the product that has been ordered by their distinct values
-ids = OrderItem.objects.values_list('product_id').distinct()
-# After we will filter them by using the product_ids that are present in the queries
-queryset = Product.objects.filter(id__in=ids).order_by('title')
-```
-
-### Deferring Fields
-
-When the database has too many fields to load we can simply avoid it by typing only.
-
-```python
-queryset = Product.objects.only('id', 'title')
-```
-
-However we need to be careful if we use only. Let's look how this can cause issue.
-
-```python
-<html>
-  <body>
-    <h1>Hello World!</h1>
-    <ul>
-      {% for product in products %}
-      <li>{{ product.title }} {{ product.unit_price }}</li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
-```
-
-These takes a massive amount of time to load. Now if we look at the sql queries, we will see it has made the query to fetch unit_price. However, the `queryset` only fetched id and title. So for `unit_price`, it had to call the database `N=1000` times for us. Moral of the story, we need to be careful when fetching the data.
-
-Let's talk about deferring. Sometime we are sure we don't want certain fields. Then we can take help of defer.
-
-```python
-queryset = Product.objects.defer('description')
-```
-
-### Selection of Related Objects
-
-For a moment, let's assume we want to fetch the product title and the collection it belongs to. Hence, we have written this query in our template.
+Render example:
 
 ```html
-<html>
-  <body>
-    <h1>Hello World!</h1>
+<ul>
+  {% for product in products %}
+  <li>
+    {{ product.title }} - {{ product.collection.title }}
     <ul>
-      {% for product in products %}
-      <li>{{ product.title }} {{ product.collection.title }}</li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
-```
-
-with the following query in the views.
-
-```python
-queryset = Product.objects.all()
-```
-
-If we do that we will face a similar problem we have faced before. The query takes too much time to execute.
-
-For the reason, we can preload the data from necessary field, here in our case the `collection` field.
-
-```python
-queryset = Product.objects.select_related('collection').all()
-```
-
-We have to keep one thing in mind. When the relationship is 1 to N, means a product can be associated with only one collection, we will use select_related.
-
-However we use `prefetch_related()` when the other end of the relationship has N. Means a product can be associated to many promotions.
-
-```python
-queryset = Product.objects.prefetch_related('collection').all()
-```
-
-We can also use a combination of them. We can see the product title, the collection it belongs to and all the promotions it is attached to just with this
-
-```python
-<html>
-  <body>
-    <h1>Hello World!</h1>
-    <ul>
-      {% for product in products %}
-      <li>
-        {{ product.title }} - {{ product.collection.title }}
-        <ul>
-          {% for promo in product.promotions.all %}
-          <li>{{ promo.description }}</li>
-          {% empty %}
-          <li>No promotions</li>
-          {% endfor %}
-        </ul>
-      </li>
+      {% for promo in product.promotions.all %}
+      <li>{{ promo.description }}</li>
       {% empty %}
-      <li>No products</li>
+      <li>No promotions</li>
       {% endfor %}
     </ul>
-  </body>
-</html>
+  </li>
+  {% empty %}
+  <li>No products</li>
+  {% endfor %}
+</ul>
 ```
 
-Let's do one exercise. Get the last 5 orders with their customer and items. That can be achieved by the following code
+**Exercise:** last 5 orders with their customer and items (including product)
 
 ```python
-queryset = Order.objects.select_related('customer').order_by('-placed_at')[:5]
-```
-
-### Aggregating Objects
-
-There are many aggregate functions inside django which we can import from `django.db.models.aggregates`.
-
-If we want to get on how many entries are in a database, we can simply do them using
-
-```python
-result = Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
-```
-
-### Annotating Objects
-
-We can add extra fields into the table when we are fetching via aggregating function. We can add an extra field `is_new` to every customer row.
-
-```python
-queryset = Customer.objects.annotate(is_new=Value(True))
-```
-
-If you look at the specific SQL queries inside the database it is creating the following command,
-
-```python
-SELECT "store_customers"."id",
-       "store_customers"."first_name",
-       "store_customers"."last_name",
-       "store_customers"."email",
-       "store_customers"."phone",
-       "store_customers"."birth_date",
-       "store_customers"."membership",
-       true AS "is_new"
-FROM "store_customers"
-```
-
-### Calling Database Functions
-
-Now let's assume we want to get the full name of the customer. We can use `CONCAT` function.
-
-```python
-queryset = Customer.objects.annotate(
-    full_name=Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
+# If the reverse name is `orderitem_set`; adjust to your related_name if different
+qs = (
+    Order.objects
+    .select_related("customer")
+    .prefetch_related("orderitem_set__product")
+    .order_by("-placed_at")[:5]
 )
 ```
 
-However, we can get the same result using the same query
+### 11. Aggregations
 
 ```python
-queryset = Customer.objects.annotate(
-        full_name=Concat('first_name', Value(' '), 'last_name')
-    )
-```
+from django.db.models import Count, Min, Max, Avg, Sum
 
-### Grouping Data
-
-If we want to see the count of orders of each customer we can also see that using the count variable.
-
-```python
-queryset = Customer.objects.annotate(
-        orders_count=Count('order_count')
-    )
-```
-
-### Expressions
-
-Now let's assume we want to get the price list after applying discount. How can we do it.
-
-```python
-discounted_price = ExpressionWrapper(F('unit_price') * 0.8, output_field=DecimalField())
-
-queryset = Product.objects.annotate(
-    discounted_price = discounted_price
+result = Product.objects.aggregate(
+    count=Count("id"),
+    min_price=Min("unit_price"),
 )
 ```
 
-> F is Django’s F expression. It lets you refer to a database field’s value directly in the query, so the math/comparison happens in SQL, not in Python. F('unit_price') \* 0.8 builds the expression “take each row’s unit_price and multiply by 0.8”.
+### 12. Annotations
 
-### Querying Generic Relationships
-
-As we have already mentioned a the store app and models app are separated. We have deliberately kept them separate just to make them more reusable.
-
-However we can connect them using ContentType table. On the database named `content_type`. For that we need to import the models from ContentType table in order to connect those two items.
-
-Here is a short description.
+Attach computed fields per row.
 
 ```python
-def say_hello(request):
-    content_type = ContentType.objects.get_for_model(Product)
+from django.db.models import Value, BooleanField
 
-    queryset = TaggedItem.objects.select_related('tag').filter(
-        content_type = content_type,
-        object_id = 1
-    )
-
-    return render(request, 'hello.html', {'name': 'Pritom', 'customer': list(queryset)})
+qs = Customer.objects.annotate(is_new=Value(True, output_field=BooleanField()))
 ```
 
-Let's go through this query one by one. What this line tells, `content_type = ContentType.objects.get_for_model(Product)`, is to find the id of content_type where `app_label` is 'store' and model is 'Product'.
+### 13. Calling database functions
 
 ```python
-queryset = TaggedItem.objects.select_related('tag').filter(
-    content_type = content_type,
-    object_id = 1
+from django.db.models import F, Value
+from django.db.models.functions import Concat
+
+qs = Customer.objects.annotate(
+    full_name=Concat("first_name", Value(" "), "last_name")
 )
 ```
 
-Even though we have taggedItem but the label tag is only available in the the SQL table `tags_tag`. After joining the table we will perform some filtering operation where `content_type=14`
+### 14. Grouping data
 
-### Custom Managers
-
-If we look at the previous code, it is clearly visible it is a verbose code. It would have been really nice if we just write `TaggedItem.objects.get_tags_for(Product, 1)`
-
-We can set up our custom manager inside the model file, using the following code
+Count orders per customer (adjust relation name to your models):
 
 ```python
+from django.db.models import Count
+
+qs = Customer.objects.annotate(orders_count=Count("orders"))
+```
+
+### 15. Expressions
+
+```python
+from decimal import Decimal
+from django.db.models import F, DecimalField, ExpressionWrapper
+
+discounted_price = ExpressionWrapper(
+    F("unit_price") * Decimal("0.80"),
+    output_field=DecimalField(max_digits=6, decimal_places=2),
+)
+
+qs = Product.objects.annotate(discounted_price=discounted_price)
+```
+
+### 16. Querying generic relations
+
+```python
+from django.contrib.contenttypes.models import ContentType
+
+ct = ContentType.objects.get_for_model(Product)
+qs = TaggedItem.objects.select_related("tag").filter(
+    content_type=ct,
+    object_id=1,
+)
+# Alternatively, if you have the instance:
+# qs = TaggedItem.objects.select_related("tag").filter(content_object=product)
+```
+
+### 17. Custom managers
+
+```python
+from django.contrib.contenttypes.models import ContentType
+
 class TaggedItemManager(models.Manager):
     def get_tags_for(self, obj_type, obj_id):
-        content_type = ContentType.objects.get_for_model(obj_type)
-
-        return TaggedItem.objects.select_related('tag').filter(
-            content_type = content_type,
-            object_id = obj_id
+        ct = ContentType.objects.get_for_model(obj_type)
+        return (
+            self.get_queryset()
+            .select_related("tag")
+            .filter(content_type=ct, object_id=obj_id)
         )
-```
 
-and inside the TaggedItem class, we can include the following code
-
-```python
 class TaggedItem(models.Model):
     objects = TaggedItemManager()
 ```
 
-### Query Caching
+### 18. Query caching
 
-When we talk about query we have to talk about query caching. Let's look at this line of code
-
-```python
-queryset = Products.objects.alL()
-list(queryset)
-queryset[0]
-```
-
-First all the all the products will be fetched from the disk. Since it is a expensive query django will store the result of queryset. Then whichever operation we perform, django will use the stored result.
+QuerySets cache results **after evaluation**. Reusing the same evaluated QuerySet avoids a second trip to the database.
 
 ```python
-queryset = Products.objects.alL()
-queryset[0]
-list(queryset)
-```
+qs = Product.objects.all()
+list(qs)      # hits the DB and caches the result
+qs[0]         # served from cache (no extra query)
 
-Now storing the query will not happen as, the first query only asks for the first element, and the second query asks for all the elements.
+qs = Product.objects.all()
+qs[0]         # hits the DB (no cache yet)
+list(qs)      # now hits the DB again to load the full result set
+```
 
 ### Creating Objects
 
