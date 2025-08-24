@@ -1,17 +1,30 @@
-## Project Setup
+# Project Setup
 
-### First things first
+### Set up a project‑local virtual environment and install Django
 
-Let us navigate to the directory and create a virtual environment for the project. Let's type the command
+Run:
 
 ```bash
+# macOS/Linux
 PIPENV_VENV_IN_PROJECT=1 pipenv install django
 ```
 
-Here are some descriptions about the command
+**What this does**
 
-- It uses Pipenv, a tool that manages Python dependencies and virtual environments, to install the `django` packages into a project.
-- The line `PIPENV_VENV_IN_PROJECT=1` tells pipnv, **Rather than using the global shared space create a virtual environment inside the project**
+- Uses **Pipenv** to create/manage a virtual environment and lock dependencies.
+- Sets `PIPENV_VENV_IN_PROJECT=1` so Pipenv creates the environment in `./.venv` (inside your project) instead of a global location.
+- Installs **Django** and records it in your `Pipfile`, then locks versions in `Pipfile.lock`.
+
+**Windows equivalents**
+
+- PowerShell:
+  ```powershell
+  $env:PIPENV_VENV_IN_PROJECT = 1; pipenv install django
+  ```
+- Command Prompt:
+  ```cmd
+  set PIPENV_VENV_IN_PROJECT=1 && pipenv install django
+  ```
 
 ### Create a project
 

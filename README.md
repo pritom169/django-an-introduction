@@ -1,6 +1,6 @@
 # Storefront (Django Demo)
 
-A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **Admin customization**, **generic relations (tags)**, and **PostgreSQL**. Deep tutorials can be found in **`django-part1/README.md`**.
+A compact Django e‑commerce demo I used for myself to teach **ORM basics**, **Admin customization**, **generic relations (tags)**, and **PostgreSQL**. Deep tutorials can be found in [django-part1](https://github.com/pritom169/django-an-introduction/blob/main/django-part1/README.md)
 
 ## Features
 
