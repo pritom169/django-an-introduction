@@ -461,44 +461,68 @@ class LinkedItem(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
 ```
 
-#### Creating Migrations
+#### Migrations
 
-When it comes to creating migration, we can simply perform it by typing the command
+Migrations are version‑controlled schema changes generated from your models.
+
+##### Create migration files
 
 ```bash
-python manage.py makemigrations
+python manage.py makemigrations            # all apps with changes
+python manage.py makemigrations store      # a specific app
+python manage.py makemigrations store --name add_customer_index
 ```
 
-For every app, it will create a migration file inside the `migration` folder.
+Django writes migration files into each app’s `migrations/` directory.
 
-### Performing Migrations
-
-Since we have done the migrations, now we have to perform the migration in order to create the database.
+##### Apply migrations
 
 ```bash
+python manage.py migrate                   # apply all unapplied migrations
+python manage.py migrate store             # apply only the 'store' app
+```
+
+##### Example: table name & composite index
+
+If you rename the table and add an index, put that in the model’s `Meta`:
+
+```python
+from django.db import models
+
+class Customer(models.Model):
+    ...
+    class Meta:
+        db_table = "store_customers"
+        indexes = [
+            models.Index(fields=["last_name", "first_name"]),
+        ]
+```
+
+Then create and apply a migration:
+
+```bash
+python manage.py makemigrations store --name customer_table_and_index
 python manage.py migrate
 ```
 
-Now say we want to change something and then want to perform the migration. Lets add the following code inside Customer class.
+Keep migrations small and focused (ideally one logical change per migration) to make reviews and rollbacks easier.
 
-```python
-class Meta:
-    db_table = 'store_customers'
-    indexes = [
-        models.Index(fields=['last_name', 'first_name'])
-    ]
+##### Revert / roll back
+
+List migrations and their state:
+
+```bash
+python manage.py showmigrations store
 ```
 
-This code perform two tasks:
+Migrate to a specific migration (by number or name), or unapply all with `zero`:
 
-1. Changes the database table to `db_table`
-2. Makes a composite index to make some queries performs faster. `Customer.objects.filter(last_name="Smith", first_name="John")`
+```bash
+python manage.py migrate store 0003
+python manage.py migrate store zero
+```
 
-If perform the migration and look at the migrations folder, we see the new migration file has a very tedious name. This teaches us a lesson, the two changes we are doing should not have been done in one go, in each migration we should have at most two changes.
-
-### Reverting Migrations
-
-Of course we can reverse our changes in git, however if we want to revert back to some version of the migration, we can simply do it typing the command `python manage.py migrate store 0003`. Just the migration number is good enough to perform the migration.
+Use `--plan` to preview changes, and `--fake` only for exceptional cases when the database already matches the desired state.
 
 ### Connecting to PostgresSQL
 
