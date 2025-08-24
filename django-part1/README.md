@@ -1391,21 +1391,53 @@ class CollectionAdmin(admin.ModelAdmin):
 - To filter multiple values, pass a comma‑separated string to `__in`, e.g., `{"collection__id__in": "1,2,3"}`.
 - Adding `list_filter = ["collection"]` to `ProductAdmin` will show the same filter pre‑selected in the sidebar when the page opens.
 
-### Adding Search to the List Page
+### Adding search to the list page
 
-If we want to search customers by their name, we can include the `search_fields = ['first_name', 'last_name']`.
-
-But there is a problem with it, if we put "n" into the search field, it shows all the names that includes the character 'n'. However what we want to have is the first character of first name or last name 'm'. We have to change the search filed to something like this
+Enable the search box by declaring `search_fields` on the `ModelAdmin`.
 
 ```python
-search_fields = ['first_name__startswith', 'last_name__startswith']
+from django.contrib import admin
+from . import models
+
+@admin.register(models.Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    # Default for strings is case‑insensitive containment (icontains)
+    search_fields = [
+        "^first_name",   # case‑insensitive prefix match (istartswith)
+        "^last_name",
+        "email",         # substring match anywhere (icontains)
+    ]
+    search_help_text = "Search by first/last name (prefix) or anywhere in email."
 ```
 
-Now this comes with another issue, if we just put 'm' into the search field, it shows nothing. As there is no names starting with `m`, the search result it empty. What this tells us, we have to make the search result character insensitive.
+**How it works**
+
+- Without a prefix, Django uses `__icontains` (substring, case‑insensitive).
+- Prefix a field with:
+  - `^` → use `istartswith` (fast prefix search; case‑insensitive).
+  - `=` → use exact match.
+  - `@` → use full‑text search (PostgreSQL only).
+- You can traverse relations with double‑underscores, e.g., `order__customer__email`.
+
+**Examples**
 
 ```python
-search_fields = ['first_name__istartswith', 'last_name__istartswith']
+# Customers whose first name starts with “m” (case‑insensitive)
+search_fields = ["^first_name"]
+
+# Search by phone or email anywhere in the string
+search_fields = ["phone", "email"]
+
+# Search orders by customer email prefix and order id exactly
+@admin.register(models.Order)
+class OrderAdmin(admin.ModelAdmin):
+    search_fields = ["^customer__email", "=id"]
 ```
+
+**Notes**
+
+- If initial searches return too many results, prefer `^` to keep queries selective and add appropriate DB indexes.
+- Use `search_help_text` to guide admins on what the search box matches.
 
 ### Adding Filtering to the List page
 
