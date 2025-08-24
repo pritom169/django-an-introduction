@@ -313,27 +313,30 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)  # updated on each save
 ```
 
-### Choice Fields
+### Choice fields
 
-If a schema entity can have a limited choice, we can do that using choices. Inside the choices which only accepts a dictionary. We can also provide a default value. Here is the code for Customer model for more reference.
+We use `choices` when a field should accept only a finite set of values. In Django, `choices` is an **iterable of `(value, label)` pairs** (not a dict). Prefer `TextChoices`/`IntegerChoices` enums for readability and type‑safety, and set a sensible `default`.
 
 ```python
-class Customer(models.Model):
-    MEMBERSHIP_BRONZE = 'B'
-    MEMBERSHIP_SILVER = 'S'
-    MEMBERSHIP_GOLD = 'G'
+from django.db import models
 
-    MEMBERSHIP_CHOICES = [
-        (MEMBERSHIP_BRONZE, 'Bronze'),
-        (MEMBERSHIP_SILVER, 'Silver'),
-        (MEMBERSHIP_GOLD, 'Gold')
-    ]
+class Customer(models.Model):
+    class Membership(models.TextChoices):
+        BRONZE = "B", "Bronze"
+        SILVER = "S", "Silver"
+        GOLD   = "G", "Gold"
+
     first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.CharField(unique=True)
-    phone = models.IntegerField(max_length=255)
-    birth_date = models.DateField(null=True)
-    membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+    last_name  = models.CharField(max_length=255)
+    email      = models.EmailField(unique=True)
+    # Keep phone as text; numbers can include +, spaces, parentheses, etc.
+    phone      = models.CharField(max_length=32, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    membership = models.CharField(
+        max_length=1,
+        choices=Membership.choices,
+        default=Membership.BRONZE,
+    )
 ```
 
 ### Defining Relationship
