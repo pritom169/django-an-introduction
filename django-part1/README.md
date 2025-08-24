@@ -339,114 +339,126 @@ class Customer(models.Model):
     )
 ```
 
-### Defining Relationship
+### Defining relationships
 
-#### One to one relationship
+#### One-to-one
 
-Let's consider how we can set up a one-to-one relationship. A customer can only have one address and an address can only be assigned to only one customer. The following code is self explanatory.
+Use a `OneToOneField` when each record in one table relates to exactly one record in another. Example: each `Customer` has a single `Address`.
+
+```python
+from django.db import models
+
+class Address(models.Model):
+    street   = models.CharField(max_length=255)
+    city     = models.CharField(max_length=255)
+    customer = models.OneToOneField(
+        'Customer',
+        on_delete=models.CASCADE,
+        related_name='address',
+        primary_key=True,  # Address PK equals the Customer PK
+    )
+```
+
+- The reverse accessor is `customer.address` (because of `related_name`).
+- `CASCADE` removes the address when its customer is deleted.
+
+#### One-to-many
+
+Put the `ForeignKey` on the "many" side. Example: a `Customer` can have many `Address` rows.
 
 ```python
 class Address(models.Model):
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, primary_key=True)
+    street   = models.CharField(max_length=255)
+    city     = models.CharField(max_length=255)
+    customer = models.ForeignKey(
+        'Customer',
+        on_delete=models.CASCADE,
+        related_name='addresses',
+    )
 ```
 
-The customer property creates a one-to-one relationship with the CUSTOMER table. One positive thing is that, we don't have to go to the address class and repeat the same code. Django takes care of that.
+- Use `PROTECT` if you want to prevent deleting a customer that still has addresses.
 
-#### One to many relationship
+#### Many-to-many
 
-When setting one-to-many relationship, the entity which is one the end of `many` must have a variable that points to that one table it is pointing to. Look at class Address.
-
-```python
-class Address(models.Model):
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-```
-
-Here multiple address can be assigned to one customer. If The customer field gets deleted, all the address associated with it, will also should be deleted. Thus we have chosen models.CASCADE. If we don't want to delete them, we should have chosen models.PROTECT.
-
-#### Many to Many relationship
-
-Just like one to one relationship, in many to many relationship we also have to mention the relationship to one class and the rest of the work will be done by django.
-
-Let's look at the class of Product and Promotion. A Product can have multiple promotion and a promotion can have multiple products. Look at the code for more reference
+Use `ManyToManyField` for symmetric N↔N relations. Django creates the join table automatically (or you can specify `through=` for a custom one).
 
 ```python
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
-    discount = models.FloatField()
+    discount    = models.FloatField()
 
 class Product(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    price = models.‚DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.IntegerField()
+    title       = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    unit_price  = models.DecimalField(max_digits=6, decimal_places=2)
+    inventory   = models.PositiveIntegerField()
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    collection  = models.ForeignKey('Collection', on_delete=models.PROTECT, related_name='products')
+    promotions  = models.ManyToManyField(Promotion, blank=True)
 ```
 
-#### Resolving Circular Relationships
+#### Avoiding circular dependencies
 
-For instance, we need a two way relationship within two table. In this project, for example multiple products can point to one collection and multiple collection can point to a single product. It can lead to circular dependencies. Let's look at the code for `Collection` and `Product`:
+If two models reference each other, use a _string_ model reference and consider disabling the reverse relation when it isn’t useful.
 
 ```python
 class Collection(models.Model):
     label = models.CharField(max_length=255)
-    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
+    featured_product = models.ForeignKey(
+        'Product',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='+',  # do not create a reverse relation on Product
+    )
 
 class Product(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.IntegerField()
+    title       = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    unit_price  = models.DecimalField(max_digits=6, decimal_places=2)
+    inventory   = models.PositiveIntegerField()
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    collection  = models.ForeignKey(Collection, on_delete=models.PROTECT, related_name='products')
 ```
 
-Let's focus our attention to this line `featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')`.
+- `SET_NULL` keeps the collection when the featured product is deleted.
+- `related_name='+'` prevents creating an unnecessary reverse relation on `Product`.
+- A _featured product_ is a single pointer, not a membership—so it is **not** a many‑to‑many.
 
-1. `on_delete=models.SET_NULL` means if the corresponding product is deleted, set this field to NULL.
-2. `null=True` allows the featured_product to be optional. (It can be NULL in the database).
-3. `related_name='+'` tells Django not to create a reverse relation with Product as it would create unnecessary complexities.
+#### Generic relations (contenttypes)
 
-> Question might arise: `Why not a many-to-many relationship here?` The featured_product on Collection is a special pointer—it’s like saying “this is the star product for this collection,” and that’s it. It does not mean the product “belongs” to the collection in the regular sense. That's much different from many-to-many relationship.
-
-#### Generic Relationship
-
-Generic relationships are important as it allows the apps to be more independent of each other. Here Tag will be used with Products but in future in can be used with other apps also. It uses Django’s GenericForeignKey system (with content_type and object_id) so you can tag anything (products, blog posts, users, whatever).
+Use generic relations to attach a model to arbitrary targets without tight coupling. This relies on Django’s `contenttypes` framework.
 
 ```python
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 class Tag(models.Model):
     label = models.CharField(max_length=255)
 
 class TaggedItem(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name='items')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey()
+    content_object = GenericForeignKey('content_type', 'object_id')
 ```
 
-- tag set to the “sale” Tag
-- content_type set to “Product”
-- object_id set to the product’s id
-- content_object lets you access the actual product directly
-
-Likewise LinkedItem entity was also created
+- `tag`: the tag record (e.g., “sale”).
+- `content_type`: which model the tag applies to (e.g., `Product`).
+- `object_id`: the primary key of the target row.
+- `content_object`: direct access to the target instance.
 
 ```python
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 class LinkedItem(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey()
+    content_object = GenericForeignKey('content_type', 'object_id')
 ```
 
 #### Creating Migrations
