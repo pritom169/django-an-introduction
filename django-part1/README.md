@@ -1,4 +1,4 @@
-# Project Setup
+## Project Setup
 
 ### Set up a project‑local virtual environment and install Django
 
@@ -1439,40 +1439,73 @@ class OrderAdmin(admin.ModelAdmin):
 - If initial searches return too many results, prefer `^` to keep queries selective and add appropriate DB indexes.
 - Use `search_help_text` to guide admins on what the search box matches.
 
-### Adding Filtering to the List page
+### Adding filtering to the list page
 
-Say in the admin product page we want to filter using `collection`, `last_update`. We can do them by simply adding them into the property.
+Add sidebar filters with `list_filter`. For common field types, Django provides helpful built‑ins.
 
 ```python
-list_filter = ['collection','last_update']
+from django.contrib import admin
+from . import models
+
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_filter = [
+        "collection",                                # ForeignKey → dropdown
+        ("last_update", admin.DateFieldListFilter),  # date presets (Today, Past 7 days, etc.)
+        "promotions",                                # ManyToMany → membership filter
+        # For numeric ranges (e.g., inventory), add a custom filter (below)
+    ]
 ```
 
-For some reason, let's assume assume we need to create a custom filter. Let's look at the code, let's see how we can do that.
+For numeric or custom ranges, implement `admin.SimpleListFilter`.
 
 ```python
-class InventoryFilter(admin.SimpleListFilter):
-    title = 'inventory'
-    parameter_name = 'inventory'
+class InventoryLevelFilter(admin.SimpleListFilter):
+    title = "Inventory"
+    parameter_name = "inventory_level"
 
     def lookups(self, request, model_admin):
         return [
-            ('<10', 'Low')
+            ("<10", "Low (<10)"),
+            ("10-49", "Medium (10–49)"),
+            ("50+", "High (≥50)"),
         ]
 
     def queryset(self, request, queryset):
-        if self.value() == '<10':
+        value = self.value()
+        if value == "<10":
             return queryset.filter(inventory__lt=10)
+        if value == "10-49":
+            return queryset.filter(inventory__gte=10, inventory__lt=50)
+        if value == "50+":
+            return queryset.filter(inventory__gte=50)
+        return queryset  # or return None to leave the queryset unchanged
 ```
 
-- `InventoryFilter(admin.SimpleListFilter)` We are making a customer filter page for Django admin. The filter will appear in the sidebar.
-- `title = 'inventory'` makes sure the label shown in the sidebar appears as `<10`.
-- `parameter_name = 'inventory'` means the URL would be '/admin/store/product/?inventory=<10'
-- By `lookups` function we are mentioning the filter criteria. Here is only one option
-  - Key: '<10' (internal value used in the querystring)
-  - Label: 'Low' (what the admin user sees in the sidebar)
-- By `inventory` function, we are deciding how to filter the products when a product query is clicked
-  - If user selects Low, then self.value() becomes '<10'.
-  - So it returns queryset.filter(inventory\_\_lt=10), i.e. products with fewer than 10 items in stock.
+Use it in your `ModelAdmin`:
+
+```python
+@admin.register(models.Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_filter = [
+        "collection",
+        ("last_update", admin.DateFieldListFilter),
+        InventoryLevelFilter,
+    ]
+```
+
+**Notes**
+
+- `title` controls the label shown in the sidebar.
+- `parameter_name` defines the query‑string key (e.g., `?inventory_level=50%2B`) and should be stable for bookmarks.
+- In `queryset()`, return a filtered `QuerySet` or `None` (meaning “no additional filtering”).
+- For large FK/M2M filters, consider `admin.RelatedOnlyFieldListFilter` to show only related items used by the current result set:
+
+  ```python
+  list_filter = [("collection", admin.RelatedOnlyFieldListFilter)]
+  ```
+
+- Boolean and `choices` fields get useful filters automatically—just include the field name in `list_filter`.
 
 ### Creating Custom Actions
 
