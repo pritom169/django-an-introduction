@@ -26,16 +26,29 @@ PIPENV_VENV_IN_PROJECT=1 pipenv install django
   set PIPENV_VENV_IN_PROJECT=1 && pipenv install django
   ```
 
-### Create a project
+### Create the project
 
-Now coming to the project creation.
+Create the Django project in the current directory (so `manage.py` and the `storefront/` package are placed here, not in a nested folder):
 
 ```bash
 pipenv run django-admin startproject storefront .
 ```
 
-- `pipenv run django-admin startproject storefront` runs the command inside the pip virtual environemnt
-- The `.` at the end tells Django to create the project in the current directory, not a subfolder
+**Notes**
+
+- `pipenv run …` runs the command inside your Pipenv-managed virtual environment.
+- The trailing `.` tells `django-admin` to scaffold the project **in the current directory** rather than creating an outer `storefront/` folder.
+  - If the dot is omitted, Django creates:
+    ```
+    storefront/
+      manage.py
+      storefront/
+        __init__.py
+        settings.py
+        urls.py
+        asgi.py
+        wsgi.py
+    ```
 
 ### Opening the Shell
 
