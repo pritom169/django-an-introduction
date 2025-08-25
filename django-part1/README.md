@@ -1,5 +1,6 @@
 ## Table of contents
 
+- [Final project structure](#final-project-structure)
 - [Project Setup](#project-setup)
   - [Set up a project-local virtual environment and install Django](#set-up-a-project-local-virtual-environment-and-install-django)
   - [Create the project](#create-the-project)
@@ -77,6 +78,61 @@
   - [Editing Children Using Inlines](#editing-children-using-inlines)
   - [Using Generic Relationship](#using-generic-relationship)
   - [Extending Pluggable Apps](#extending-pluggable-apps)
+
+## Final project structure
+
+```
+django-part1/
+├─ README.md
+├─ Pipfile
+├─ Pipfile.lock
+├─ manage.py
+├─ images-and-diagrams/
+│  └─ er-diagram.png
+├─ storefront/
+│  ├─ __init__.py
+│  ├─ admin.py            # site branding (site_title, site_header, index_title)
+│  ├─ settings.py
+│  ├─ urls.py             # includes admin/, playground/, and __debug__/ when DEBUG
+│  ├─ asgi.py
+│  └─ wsgi.py
+├─ playground/
+│  ├─ __init__.py
+│  ├─ admin.py
+│  ├─ apps.py
+│  ├─ migrations/
+│  │  └─ __init__.py
+│  ├─ models.py
+│  ├─ tests.py
+│  ├─ urls.py             # path("hello/", views.say_hello, name="playground-hello")
+│  └─ views.py            # say_hello → renders template with context
+│     (templates/)
+│       └─ playground/
+│          └─ hello.html
+├─ store/
+│  ├─ __init__.py
+│  ├─ admin.py            # ProductAdmin, CollectionAdmin, filters/actions, inlines
+│  ├─ apps.py
+│  ├─ migrations/
+│  │  └─ __init__.py
+│  ├─ models.py           # Product, Collection, Customer, Order, OrderItem, etc.
+│  ├─ tests.py
+│  └─ views.py
+├─ tags/
+│  ├─ __init__.py
+│  ├─ admin.py            # @admin.register(Tag)
+│  ├─ apps.py
+│  ├─ migrations/
+│  │  └─ __init__.py
+│  ├─ models.py           # Tag, TaggedItem (GenericForeignKey via contenttypes)
+│  ├─ tests.py
+│  └─ views.py
+└─ store_custom/
+   ├─ __init__.py
+   ├─ admin.py            # TagInline(GenericTabularInline), CustomProductAdmin,
+   └─ apps.py             # unregister/register Product with CustomProductAdmin
+
+```
 
 ## Project Setup
 
