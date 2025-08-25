@@ -36,7 +36,7 @@
     - [Create role and database](#create-role-and-database)
   - [Using PostgreSQL in Django](#using-postgresql-in-django)
   - [Running custom SQL via migrations](#running-custom-sql-via-migrations)
-- [7. Django ORM](#7-django-orm)
+- [Django ORM](#django-orm)
   - [1. Managers and QuerySets](#1-managers-and-querysets)
   - [2. Retrieving Objects](#2-retrieving-objects)
   - [3. Filtering objects](#3-filtering-objects)
@@ -763,7 +763,7 @@ python manage.py migrate
 
 The forward SQL runs on migrate; the `reverse_sql` runs if you roll back the migration.
 
-## 7. Django ORM
+## Django ORM
 
 ### 1. Managers and QuerySets
 
