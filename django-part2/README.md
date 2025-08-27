@@ -53,3 +53,9 @@ DATABASES = {
   }
 }
 ```
+
+### 6) Created the DB in Postgres
+
+```sql
+CREATE DATABASE storefront2;
+```
