@@ -37,3 +37,19 @@ For running the project in a successful manner, we also need to install django-d
 ```bash
 python -m pip install django-debug-toolbar
 ```
+
+### 5) Pointed Django to a new DB (storefront2)
+
+```bash
+# settings.py
+DATABASES = {
+  "default": {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": "storefront2",
+    "HOST": "localhost",
+    "USER": "", ## The username of yours
+    "PASSWORD": "", ## The password you had set
+    "PORT": 5432,
+  }
+}
+```
