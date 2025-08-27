@@ -83,3 +83,35 @@ python manage.py dbshell      # prompt should be: storefront2=>
 python manage.py showmigrations
 python manage.py check
 ```
+
+## REST
+
+REST is an architectural style for designing networked applications. It uses stateless communication (usually HTTP) where everything is modeled as resources. Clients interact with resources using standard HTTP methods (verbs).
+
+### Resources
+
+The key abstractions in REST. Anything that can be identified and addressed on the server can be identified as Resource. Each resource is identified by a URI (URL is one type of URI).
+
+### Resource Representation
+
+The format in which a resource is exchanged between client and server. Common format on which a resources are being represented are `JSON, XML, HTML, and YAML`
+
+### HTTP Methods
+
+- GET – Retrieve a resource (read-only, safe).
+- POST – Create a new resource (non-idempotent).
+- PUT – Update/replace a resource (idempotent).
+- PATCH – Partially update a resource.
+- DELETE – Remove a resource.
+- HEAD – Same as GET but only headers.
+- OPTIONS – Get communication options.
+
+> Idempotent = safe to repeat without changing the outcome.
+
+> A GET request always returns the same resource, no matter how many times you call it.
+
+> PUT /products/42 with { "name": "Laptop" } → Whether you send it once or 10 times, the result is the same: product 42’s name is “Laptop”.
+
+> DELETE /products/42 → First call deletes it. Subsequent calls still leave it deleted → effect is the same.
+
+> POST /products with { "name": "Laptop" } → Each call creates a new resource, so repeating changes the state differently.
