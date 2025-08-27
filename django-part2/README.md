@@ -59,3 +59,27 @@ DATABASES = {
 ```sql
 CREATE DATABASE storefront2;
 ```
+
+### 7) Applied schema to the new DB
+
+```sql
+source .venv/bin/activate
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 8) Created admin user + ran the server (to verify /admin/)
+
+```python
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+### 9) Verified connection / migrations
+
+```python
+python manage.py dbshell      # prompt should be: storefront2=>
+\q
+python manage.py showmigrations
+python manage.py check
+```
