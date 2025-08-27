@@ -133,3 +133,71 @@ INSTALLED_APPS = [
     ...
 ]
 ```
+
+## Creating API Views
+
+### API Views using HttpRequest and HttpResponse
+
+- First we need to create a function inside the `store/views.py` as it will be responsible when an API endpoint hits the browser URL.
+
+```python
+def product_list(request):
+    return HttpResponse('ok')
+```
+
+Now we want to the function discoverable, and we can do it inside `store/urls.py` file
+
+```python
+urlpatterns = [
+    path('products/', views.product_list)
+]
+```
+
+Now we have to make the `urls.py` discoverable to the main urls.py
+
+```python
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('playground/', include('playground.urls')),
+    path('store/', include('store.urls'))
+] + debug_toolbar_urls()
+```
+
+### API Views using Django Rest Framework
+
+Now we will use Django Rest Framework to check the API endpoints as it is more powerful and much easier to use. In order to do that we need do it in a couple of steps.
+
+```python
+### 1. Import decorators and responses
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+### 2. Add decorator on the top
+@api_view()
+
+### 3. Replace HttpResponse with just Response
+def product_list(request):
+    return Response('ok')
+```
+
+#### Taking a Parameter in the URL
+
+Now let's write a function where an ID parameter will be taken in the URL as Parameter. Inside, `url.py`, we are will add the parameter inside `<>`
+
+```python
+path('products/<id>/', views.product_detail)
+```
+
+Once it is done, we add the function inside the views.py
+
+```python
+@api_view()
+def product_detail(request, id):
+    return Response(id)
+```
+
+However even though our product id should be in integer format, right now it accepts every format. However, we can limit them by adding the type in front of the parameter.
+
+```python
+path('products/<int:id>/', views.product_detail)
+```
