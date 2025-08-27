@@ -115,3 +115,21 @@ The format in which a resource is exchanged between client and server. Common fo
 > DELETE /products/42 → First call deletes it. Subsequent calls still leave it deleted → effect is the same.
 
 > POST /products with { "name": "Laptop" } → Each call creates a new resource, so repeating changes the state differently.
+
+## Installing Django REST Framework
+
+In order to install the REST framework we must first install
+
+```bash
+pip install djangorestframework
+```
+
+Next, register it in the `INSTALLED_APPS` section of your `settings.py`:
+
+```python
+INSTALLED_APPS = [
+    ...
+    "rest_framework",
+    ...
+]
+```
