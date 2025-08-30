@@ -244,3 +244,19 @@ REST_FRAMEWORK = {
 ```
 
 Without that setting, unit_price would show up as "12.50" (string). With it, you get 12.50 (numeric).
+
+### Exception Handling
+
+When fetching a product by ID, the object may not exist, which would normally raise an error.  
+To handle this gracefully, wrap the query in a `try/except` block and return a proper HTTP 404 response.
+
+```python
+from rest_framework import status
+
+try:
+    product = Product.objects.get(pk=id)
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)
+except Product.DoesNotExist:
+    return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+```
