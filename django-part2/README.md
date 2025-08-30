@@ -331,3 +331,13 @@ Now let's change the field name unit_price to price it will show us an error. By
 ```python
 price = serializers.DecimalField(max_digits=6, decimal_places=2, source="unit_price")
 ```
+
+### Using PrimaryKeyRelatedField for a foreign key
+
+A product belongs to exactly one collection (many-to-one). Expose that FK as an integer ID and validate it by providing a queryset:
+
+```python
+collection = serializers.PrimaryKeyRelatedField(
+    queryset = Collection.objects.all()
+)
+```
