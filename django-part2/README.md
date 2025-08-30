@@ -258,5 +258,18 @@ try:
     serializer = ProductSerializer(product)
     return Response(serializer.data)
 except Product.DoesNotExist:
-    return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"detail": "Product not found."}, status=404)
+```
+
+### Using Proper HTTP Status Codes
+
+Previously, the error response used a hard-coded value. Instead, we should leverage the standard HTTP status codes provided by Django REST Framework for clarity and maintainability.
+
+```python
+# 1. Import standard HTTP status codes
+from rest_framework import status
+
+# 2. Use the appropriate status code in the exception handler
+except Product.DoesNotExist:
+    return Response(status=status.HTTP_404_NOT_FOUND)
 ```
