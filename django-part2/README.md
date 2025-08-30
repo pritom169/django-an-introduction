@@ -323,3 +323,11 @@ class ProductSerializer(serializers.Serializer):
 ```
 
 > Note: Always use Decimal instead of floating-point numbers when performing calculations with DecimalField to avoid precision errors.
+
+### Changing the name of the field
+
+Now let's change the field name unit_price to price it will show us an error. By default, Django assumes that a field exits in the model class with same name. In order to change the names properly, we have to set the source to `unit_price`.
+
+```python
+price = serializers.DecimalField(max_digits=6, decimal_places=2, source="unit_price")
+```
