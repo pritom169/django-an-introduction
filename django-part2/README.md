@@ -273,3 +273,16 @@ from rest_framework import status
 except Product.DoesNotExist:
     return Response(status=status.HTTP_404_NOT_FOUND)
 ```
+
+### Replacing `try/except` with `get_object_or_404`
+
+The previous implementation using `try/except` was more verbose.  
+Django REST Framework provides the `get_object_or_404` shortcut, which simplifies the code by automatically raising a `404 Not Found` error when the object does not exist.
+
+```python
+from django.shortcuts import get_object_or_404
+
+product = get_object_or_404(Product, pk=id)
+serializer = ProductSerializer(product)
+return Response(serializer.data)
+```
