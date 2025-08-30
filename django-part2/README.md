@@ -201,3 +201,19 @@ However even though our product id should be in integer format, right now it acc
 ```python
 path('products/<int:id>/', views.product_detail)
 ```
+
+## Serializers
+
+In Django REST Framework, serializers are used to convert complex data types (like Django models or querysets) into native Python data types (dicts, lists) that can then be easily rendered into formats like JSON or XML for APIs.
+
+### Writing a serializer class
+
+Within the `store` app, create a `serializers.py` file. In this file, we define serializer classes by specifying the fields we want to expose, similar to how fields are declared in Django models.  
+Here is an example implementation for the `Product` serializer:
+
+```python
+class ProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+    unit_price = serializers.DecimalField(max_digits=6, decimal_places=2)
+```
