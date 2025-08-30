@@ -217,3 +217,30 @@ class ProductSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     unit_price = serializers.DecimalField(max_digits=6, decimal_places=2)
 ```
+
+### Decimal to string (DRF) conversion
+
+Now if we hit the `/store/product/1/` endpoint we will see the following response
+
+```
+HTTP 200 OK
+Allow: GET, OPTIONS
+Content-Type: application/json
+Vary: Accept
+
+{
+    "id": 1,
+    "title": "Bread Ww Cluster",
+    "unit_price": "4.00"
+}
+```
+
+We can see the unit_price in string format. However, in order to convert it in floating points, we have to add the following code inside the settings.py
+
+```python
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
+```
+
+Without that setting, unit_price would show up as "12.50" (string). With it, you get 12.50 (numeric).
