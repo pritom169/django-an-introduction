@@ -360,3 +360,18 @@ def product_list(request):
     serializer = ProductSerializer(queryset, many=True)
     return Response(serializer.data)
 ```
+
+### Showing nested Object
+
+If we want to show the id and the name of the collection we have to use nested object.
+
+```python
+### 1. First we declare another serializer class for it
+class CollectionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+
+### 2. We use the object and assign it to collection
+class ProductSerializer(serializers.Serializer):
+    collection = CollectionSerializer()
+```
