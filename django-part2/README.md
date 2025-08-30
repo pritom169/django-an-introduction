@@ -341,3 +341,22 @@ collection = serializers.PrimaryKeyRelatedField(
     queryset = Collection.objects.all()
 )
 ```
+
+### Using `StringRelatedField` for Foreign Keys
+
+By default, a foreign key field returns the related object’s ID.  
+If we want to display the related object’s name (or its `__str__` representation), we can use `StringRelatedField`.
+
+```python
+collection = serializers.StringRelatedField()
+```
+
+However, this introduces a potential performance issue. When serializing multiple products, each related collection would be queried separately.
+To avoid the N+1 query problem, we can optimize the queryset by preloading the related collection using select_related.
+
+```python
+def product_list(request):
+    queryset = Product.objects.select_related("collection").all()
+    serializer = ProductSerializer(queryset, many=True)
+    return Response(serializer.data)
+```
