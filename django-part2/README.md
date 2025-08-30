@@ -286,3 +286,18 @@ product = get_object_or_404(Product, pk=id)
 serializer = ProductSerializer(product)
 return Response(serializer.data)
 ```
+
+### Querying Multiple Records
+
+So far, we have queried a single record. To fetch multiple records, we can use a queryset and serialize the results with the `many=True` option.
+
+```python
+# 1. Retrieve all products from the database
+queryset = Product.objects.all()
+
+# 2. Serialize the queryset (note: set `many=True` for multiple objects)
+serializer = ProductSerializer(queryset, many=True)
+
+# 3. Return the serialized data as the response
+return Response(serializer.data)
+```
