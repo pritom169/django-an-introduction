@@ -404,3 +404,31 @@ Now inside the `views.py` we will create the function
 def collection_detail(request, pk):
     return Response('ok')
 ```
+
+### Model Serializers
+
+Let's say we want to change the name of the product title. We have to change it in two places. We can solve this problem using `ModelSerializer`. When your API mirrors a Django model, prefer ModelSerializer. It derives fields from the model and stays in sync with model changes, so you don’t duplicate field definitions.
+
+We first change the `serializers.Serializer` to `serializers.ModelSerializer`. Afterwards, we mention the model class we want to take with the fields from.
+
+```python
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price', 'collection']
+```
+
+#### Adding a computed (read-only) field
+
+Now if we want to add price with tax, we need an extra field. Here is how we can do it
+
+```python
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price', 'price_with_tax' ,'collection']
+    price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
+
+    def calculate_tax(self, product: Product):
+        return product.unit_price * Decimal(1.1)
+```
