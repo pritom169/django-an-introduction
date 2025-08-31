@@ -450,3 +450,14 @@ def product_list(request):
         serializer = ProductSerializer(data=request.data)
         return Response('ok')
 ```
+
+### Validating Deserialized Data
+
+```python
+serializer = ProductSerializer(data=request.data)
+### Check whether the serialized data is valid or not
+if serializer.is_valid():
+    serializer.validated_data
+else:
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+```
