@@ -432,3 +432,21 @@ class ProductSerializer(serializers.ModelSerializer):
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
 ```
+
+## Deserializers
+
+Deserializing is actually opposite of serializing. In short, taking incoming data (usually JSON from an HTTP request) and convert it back into Python objects (validated dicts or even Django model instances).
+
+```python
+### Previously, we didn't include any request type at the top. But now the same endpoint can server as GET or POST.
+@api_view(['GET', 'POST'])
+def product_list(request):
+    if request.method == 'GET':
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        ### Deserializing the incoming data
+        serializer = ProductSerializer(data=request.data)
+        return Response('ok')
+```
