@@ -458,6 +458,18 @@ serializer = ProductSerializer(data=request.data)
 ### Check whether the serialized data is valid or not
 if serializer.is_valid():
     serializer.validated_data
+    return Response('ok')
 else:
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+```
+
+### Validating Deserialized Data (Cleaner Way)
+
+Now we have replaced if else block by adding `(raise_exception=True)`
+
+```python
+serializer = ProductSerializer(data=request.data)
+serializer.is_valid(raise_exception=True)
+serializer.validated_data
+return Response
 ```
