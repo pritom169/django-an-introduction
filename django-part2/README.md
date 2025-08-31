@@ -375,3 +375,32 @@ class CollectionSerializer(serializers.Serializer):
 class ProductSerializer(serializers.Serializer):
     collection = CollectionSerializer()
 ```
+
+### Including a Hyperlink in the nested object to see the whole object
+
+First we have to add, HyperlinkRelatedField to the collection property. Inside the parenthesis we have to include the queryset for fetching the collection and the view function that will be executed
+
+```python
+collection = serializers.HyperlinkedRelatedField(
+    queryset = Collection.objects.all(),
+    view_name = 'collection-detail'
+)
+```
+
+In the `urls.py`, we also have to include the url
+
+```python
+urlpatterns = [
+    path('products/', views.product_list),
+    path('products/<int:id>/', views.product_detail),
+    path('collection/<int:pk>/', views.collection_detail, name='collection-detail')
+]
+```
+
+Now inside the `views.py` we will create the function
+
+```python
+@api_view()
+def collection_detail(request, pk):
+    return Response('ok')
+```
