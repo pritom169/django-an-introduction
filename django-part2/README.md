@@ -513,14 +513,14 @@ This method is called when you make a PUT or PATCH request to a product's detail
 
 ```python
 def update(self, instance, validated_data):
-# 'instance' is the existing Product object that you're updating.
-# This line gets the 'unit_price' from the validated request data
-# and updates the product's unit_price with it.
-instance.unit_price = validated_data.get('unit_price')
+    # 'instance' is the existing Product object that needs updating.
+    # This line gets the 'unit_price' from the validated request data
+    # and updates the product's unit_price with it.
+    instance.unit_price = validated_data.get('unit_price')
 
-# Saves the changes to the database.
-instance.save()
+    # Saves the changes to the database.
+    instance.save()
 
-# Returns the updated product instance.
-return instance
+    # Returns the updated product instance.
+    return instance
 ```
