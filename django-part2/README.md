@@ -488,3 +488,39 @@ The database table has 1000 products in that table, but the database was trying 
 - Used the built-in Django management command sqlsequencereset. For the project, the command is: `pipenv run python django-part2/manage.py sqlsequencereset store`. This command generates the necessary SQL to reset the ID counters for all the tables in your store app, based on
   the current data in those tables.
 - Applying the Fix: I then executed the generated SQL on your database by piping the output of the previous command to Django's dbshell utility: `pipenv run python django-part2/manage.py sqlsequencereset store | pipenv run python`. This command took the generated SQL and executed it directly on your PostgreSQL database, which reset the ID counter for the store_product table to start after the highest existing ID (1000).
+
+### Creating Product
+
+This method is called when you make a POST request to /store/products/ to create a new product. After the
+serializer validates the incoming data, it calls this create method.
+
+```python
+def create(self, validated_data):
+    # Creates a new Product instance using the validated data from the request.
+    product = Product(**validated_data)
+    # This line will cause an error. The Product model doesn't have a field
+    # named 'other', so trying to set it will raise an AttributeError.
+    product.other = 1
+    # Saves the new product to the database.
+    product.save()
+    # Returns the newly created product instance.
+    return product
+```
+
+### Updating the Product
+
+This method is called when you make a PUT or PATCH request to a product's detail URL (e.g., /store/products/1/) to update an existing product.
+
+```python
+def update(self, instance, validated_data):
+# 'instance' is the existing Product object that you're updating.
+# This line gets the 'unit_price' from the validated request data
+# and updates the product's unit_price with it.
+instance.unit_price = validated_data.get('unit_price')
+
+# Saves the changes to the database.
+instance.save()
+
+# Returns the updated product instance.
+return instance
+```
