@@ -473,3 +473,18 @@ serializer.is_valid(raise_exception=True)
 serializer.validated_data
 return Response
 ```
+
+### [ISSUE] Id counter fix
+
+The root cause of the IntegrityError: duplicate key value violates unique constraint "store_product_pkey" was that your PostgreSQL database's internal ID counter for the store_product table was out of sync with the actual data in the table.
+
+The database table has 1000 products in that table, but the database was trying to assign a new product a very low ID (like 11 or 12), which was already in use. This happens sometimes if data is imported manually or after a database restore, which can cause the primary key sequence (the ID counter) to not be updated correctly.
+
+#### Fixation
+
+- First we have to perform some dependency resolution. **django-debug-toolbar:** This was required to run some of the Django management commands.
+- Used the built-in Django management command sqlsequencereset. For your project, the
+  command was `pipenv run python django-part2/manage.py sqlsequencereset store`
+- Used the built-in Django management command sqlsequencereset. For the project, the command is: `pipenv run python django-part2/manage.py sqlsequencereset store`. This command generates the necessary SQL to reset the ID counters for all the tables in your store app, based on
+  the current data in those tables.
+- Applying the Fix: I then executed the generated SQL on your database by piping the output of the previous command to Django's dbshell utility: `pipenv run python django-part2/manage.py sqlsequencereset store | pipenv run python`. This command took the generated SQL and executed it directly on your PostgreSQL database, which reset the ID counter for the store_product table to start after the highest existing ID (1000).
