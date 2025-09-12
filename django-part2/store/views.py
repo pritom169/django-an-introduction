@@ -41,5 +41,9 @@ def collection_detail(request, pk):
     if request.method == 'GET':
         serializer = CollectionSerializer(collection)
         return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     return Response('ok')
