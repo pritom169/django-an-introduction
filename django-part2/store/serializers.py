@@ -6,6 +6,11 @@ class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ['id', 'title']
+    
+    def create(self, validated_data):
+        collection = Collection(**validated_data)
+        collection.save()
+        return collection
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
