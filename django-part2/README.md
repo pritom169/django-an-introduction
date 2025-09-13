@@ -524,3 +524,5 @@ def update(self, instance, validated_data):
     # Returns the updated product instance.
     return instance
 ```
+
+## Class-based Views
