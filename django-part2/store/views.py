@@ -35,6 +35,13 @@ def product_detail(request, id):
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view()
+def collection_list(request):
+    queryset = Collection.objects.all()
+    serializer = CollectionSerializer(queryset, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def collection_detail(request, pk):
     collection = get_object_or_404(Collection, pk=id)
