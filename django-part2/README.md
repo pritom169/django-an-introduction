@@ -526,3 +526,27 @@ def update(self, instance, validated_data):
 ```
 
 ## Class-based Views
+
+We can refactor our function-based API views into class-based views for improved readability, maintainability, and scalability. Each HTTP method (GET, POST, PUT, DELETE) is implemented as a dedicated method (get, post, put, delete) within the class.
+
+```python
+class ProductDetail(APIView):
+    def get(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        if product.orderitems.count() > 0:
+            return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
