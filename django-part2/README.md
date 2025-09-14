@@ -700,13 +700,15 @@ Now generic views provides some default feature which may not be enough sometime
 
 ### Replacing generic requests with Class Attributes
 
-We can replace
+When using Django REST Framework's generic class-based views, you can simplify your view definitions by specifying class attributes such as `queryset` and `serializer_class`. This approach eliminates the need to explicitly implement methods like `get()` and `put()` when their behavior is standard. The generic views will automatically use these attributes to handle common operations, making your code more concise and maintainable.
+
+#### Before: Explicit Method Implementations
 
 ```python
 def get(self, request, id):
-        product = get_object_or_404(Product, pk=id)
-        serializer = ProductSerializer(product)
-        return Response(serializer.data)
+    product = get_object_or_404(Product, pk=id)
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)
 
 def put(self, request, id):
     product = get_object_or_404(Product, pk=id)
@@ -716,9 +718,11 @@ def put(self, request, id):
     return Response(serializer.data)
 ```
 
-with
+#### After: Using Class Attributes
 
 ```python
 queryset = Product.objects.all()
 serializer_class = ProductSerializer
 ```
+
+By defining `queryset` and `serializer_class` as class attributes, the generic view classes will handle the standard GET, PUT, and other HTTP methods for you. Override these attributes or provide custom methods only when you need specialized behavior.
