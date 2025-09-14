@@ -683,3 +683,13 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     products_count = serializers.IntegerField()
 ```
+
+#### Read Only Fields
+
+There is one small issue with the current implementation. Now in order to add a collection, we also have to input `products_count`. However that `products_count` is a computed field which should not be manually entered.
+
+We can eliminate the following issue just by adding read_only in the computed_field.
+
+```python
+products_count = serializers.IntegerField(read_only=True)
+```
