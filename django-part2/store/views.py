@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -8,11 +9,8 @@ from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
 
 class ProductList(ListCreateAPIView):
-    def get_queryset(self):
-        return Product.objects.select_related('collection').all()
-    
-    def get_serializer(self, *args, **kwargs):
-        return ProductSerializer()
+    queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
     
     def get_serializer_context(self):
         return {'request': self.request}
