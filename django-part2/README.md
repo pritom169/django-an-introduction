@@ -734,3 +734,16 @@ In the URL unless you have a strong reason to change it, because DRF and Django 
 ```python
 path('products/<int:pk>/', views.ProductDetail.as_view()),
 ```
+
+#### Aligning URL Parameters with View Methods
+
+In the current implementation, the `delete` method uses `id` as a parameter, while the URL pattern expects `pk`. For consistency with Django REST Framework conventions, it is recommended to align both to use `pk`.
+
+```python
+def delete(self, request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if product.orderitems.count() > 0:
+        return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    product.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+```
