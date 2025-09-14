@@ -1,22 +1,23 @@
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
-from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
 
-class ProductList(ListCreateAPIView):
-    def get_queryset(self):
-        return Product.objects.select_related('collection').all()
+class ProductList(APIView):
+    def get(self, request):
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
     
-    def get_serializer(self, *args, **kwargs):
-        return ProductSerializer()
-    
-    def get_serializer_context(self):
-        return {'request': self.request}
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ProductDetail(APIView):
     def get(self, request, id):
