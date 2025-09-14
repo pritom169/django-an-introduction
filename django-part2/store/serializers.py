@@ -5,12 +5,9 @@ from store.models import Product, Collection
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'products_count']
     
-    def create(self, validated_data):
-        collection = Collection(**validated_data)
-        collection.save()
-        return collection
+    products_count = serializers.IntegerField()
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
