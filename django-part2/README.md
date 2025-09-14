@@ -640,3 +640,21 @@ def get_serializer(self, *args, **kwargs):
 Open the browser and navigate to `http://localhost:8000/store/products/`. All the previously implemented functionalities remain available.
 
 Additionally, the interface now provides extra features. At the bottom of the page, you can find input fields for Title, Description, Slug, Inventory, Unit Price, and Collection. If preferred, you can switch to the "Raw Data" view to input data directly in JSON format. It is an extra benefit one gets for using Generics.
+
+#### Adding Product Count to Collection
+
+##### Product model reverse corelation
+
+In the new ProductModel
+
+```python
+class Product(models.Model):
+    collection = models.ForeignKey(
+        Collection,
+        on_delete=models.PROTECT,
+        related_name="products"
+    )
+```
+
+- This makes the reverse relation from Collection → Product accessible as collection.products.
+- Without related_name, Django would have called this product_set.
