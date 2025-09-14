@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.db.models import Count
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
@@ -34,18 +34,13 @@ class ProductDetail(APIView):
             return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
-@api_view(['GET', 'POST'])
-def collection_list(request):
-    if request.method == 'GET':
-        queryset = Collection.objects.all()
-        serializer = CollectionSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = CollectionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class CollectionList(ListCreateAPIView):
+    queryset = Collection.objects.annotate(products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def collection_detail(request, pk):
