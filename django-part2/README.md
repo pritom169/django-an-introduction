@@ -726,3 +726,11 @@ serializer_class = ProductSerializer
 ```
 
 By defining `queryset` and `serializer_class` as class attributes, the generic view classes will handle the standard GET, PUT, and other HTTP methods for you. Override these attributes or provide custom methods only when you need specialized behavior.
+
+#### Replacing primary key
+
+In the URL unless you have a strong reason to change it, because DRF and Django both conventionally expect pk.
+
+```python
+path('products/<int:pk>/', views.ProductDetail.as_view()),
+```
