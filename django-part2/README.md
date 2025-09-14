@@ -670,3 +670,16 @@ queryset = Collection.objects.annotate(products_count=Count('products')).all()
 - Count('products') uses the reverse relation defined by related_name="products".
 - For every Collection row, Django adds a calculated field called products_count, which is the number of products linked to that collection.
 - The .annotate() ensures this value is available as part of each Collection object in the queryset.
+
+##### The serializer
+
+In CollectionSerializer:
+
+```python
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ['id', 'title', 'products_count']
+
+    products_count = serializers.IntegerField()
+```
