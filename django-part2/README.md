@@ -550,3 +550,56 @@ class ProductDetail(APIView):
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 ```
+
+    def get_serializer_context(self):
+
+## Mixins
+
+Mixins is a pattern of data that encapsulates some pattern of codes.
+
+## Generic Views
+
+Most of the time we are not going to use a mixin, however we are going to use a combination of mixin aka Generic Views.
+
+Let's look at these block of codes.
+
+```python
+def get(self, request):
+    queryset = Product.objects.select_related('collection').all()
+    serializer = ProductSerializer(queryset, many=True, context={'request': request})
+    return Response(serializer.data)
+
+def post(self, request):
+    serializer = ProductSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+```
+
+They can be replaced with the following querysets.
+
+```python
+def get_queryset(self):
+    return Product.objects.select_related('collection').all()
+
+def get_serializer(self, *args, **kwargs):
+    return ProductSerializer()
+
+def get_serializer_context(self):
+    return {'request': self.request}
+```
+
+- get_queryset() → replaces the explicit queryset = Product.objects... in get().
+  - DRF will automatically use this queryset for listing objects.
+- get_serializer() → replaces the explicit serializer = ProductSerializer(...) calls.
+
+  - Normally you don’t override this unless you want special behavior.
+  - In your code, it’s incomplete (return ProductSerializer() should pass \*args, \*\*kwargs), but the idea is to centralize serializer creation.
+
+- get_serializer_context() → replaces manually passing context={'request': request}.
+  - DRF will automatically add this context to every serializer it creates.
+
+So:
+
+- With manual get() / post(), you explicitly define how data is fetched, serialized, and returned.
+- With get_queryset() + get_serializer_context(), you just provide the pieces, and ListCreateAPIView automatically wires them into its built-in get() and post() logic.
