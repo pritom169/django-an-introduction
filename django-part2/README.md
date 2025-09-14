@@ -693,3 +693,32 @@ We can eliminate the following issue just by adding read_only in the computed_fi
 ```python
 products_count = serializers.IntegerField(read_only=True)
 ```
+
+### Customizing Generic Views
+
+Now generic views provides some default feature which may not be enough sometimes. As a result we need to use `RetrieveUpdateDestroyAPIView` to do some custom operation.
+
+### Replacing generic requests with Class Attributes
+
+We can replace
+
+```python
+def get(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+
+def put(self, request, id):
+    product = get_object_or_404(Product, pk=id)
+    serializer = ProductSerializer(product, data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
+```
+
+with
+
+```python
+queryset = Product.objects.all()
+serializer_class = ProductSerializer
+```
