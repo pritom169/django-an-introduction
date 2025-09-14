@@ -658,3 +658,15 @@ class Product(models.Model):
 
 - This makes the reverse relation from Collection → Product accessible as collection.products.
 - Without related_name, Django would have called this product_set.
+
+##### The queryset with annotation
+
+In the CollectionList:
+
+```python
+queryset = Collection.objects.annotate(products_count=Count('products')).all()
+```
+
+- Count('products') uses the reverse relation defined by related_name="products".
+- For every Collection row, Django adds a calculated field called products_count, which is the number of products linked to that collection.
+- The .annotate() ensures this value is available as part of each Collection object in the queryset.
