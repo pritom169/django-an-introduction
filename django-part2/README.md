@@ -603,3 +603,34 @@ So:
 
 - With manual get() / post(), you explicitly define how data is fetched, serialized, and returned.
 - With get_queryset() + get_serializer_context(), you just provide the pieces, and ListCreateAPIView automatically wires them into its built-in get() and post() logic.
+
+### Replacing methods with Class attributes
+
+#### Class attributes
+
+```python
+queryset = Product.objects.select_related('collection').all()
+serializer_class = ProductSerializer
+```
+
+- These are the default values for the view.
+
+- DRF’s ListCreateAPIView will automatically look for queryset and serializer_class at the class level if you don’t override get_queryset() or get_serializer().
+
+- So you don’t need to write those methods unless you want something dynamic.
+
+#### Methods
+
+```python
+def get_queryset(self):
+    return Product.objects.select_related('collection').all()
+
+def get_serializer(self, *args, **kwargs):
+    return ProductSerializer()
+```
+
+- These are hooks that override the defaults.
+
+- get_queryset() is used if the queryset needs to change (e.g., filter by request.user).
+
+- get_serializer() is used if you need custom serializer instantiation (though normally you override get_serializer_class() instead).
