@@ -815,3 +815,37 @@ A ModelViewSet automatically includes:
 - update (PUT)
 - partial_update (PATCH)
 - destroy (DELETE)
+
+### Routers
+
+In Django REST Framework, a router is a helper that automatically generates URL patterns for your viewsets.
+
+```python
+urlpatterns = [
+    path('products/', views.ProductList.as_view()),
+    path('products/<int:pk>/', views.ProductDetail.as_view()),
+]
+```
+
+This is fine, but once you move to ViewSets, each viewset can handle multiple actions (list, retrieve, create, update, destroy). If you don’t use a router, you’d still need to manually wire up URLs for each of those actions.
+
+On the other hand, A router inspects your ViewSet and automatically creates the standard RESTful routes for you.
+
+```python
+from rest_framework.routers import SimpleRouter
+from .views import ProductViewSet
+
+router = SimpleRouter()
+router.register('products', ProductViewSet)
+
+urlpatterns = router.urls
+```
+
+From just this, DRF generates:
+
+- GET /products/ → list
+- POST /products/ → create
+- GET /products/{pk}/ → retrieve
+- PUT /products/{pk}/ → update
+- PATCH /products/{pk}/ → partial update
+- DELETE /products/{pk}/ → destroy
