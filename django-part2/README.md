@@ -747,3 +747,71 @@ def delete(self, request, pk):
     product.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 ```
+
+## ViewSets
+
+- A viewset is a class that bundles together the logic for a set of related views (like list, create, retrieve, update, delete) into a single class.
+- Instead of manually writing separate views for each HTTP method or operation, you define everything in one place.
+- DRF’s routers can then automatically generate the corresponding URL patterns for you.
+
+Let's look at the previous code
+
+```python
+class ProductList(ListCreateAPIView):
+    queryset = Product.objects.select_related('collection').all()
+    serializer_class = ProductSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+class ProductDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def delete(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        if product.orderitems.count() > 0:
+            return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
+
+has been converted into
+
+```python
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def delete(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        if product.orderitems.count() > 0:
+            return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
+
+What was happening before
+
+- ProductList(ListCreateAPIView) handled:
+  - GET /products/ → list all products
+  - POST /products/ → create a product
+- ProductDetail(RetrieveUpdateDestroyAPIView) handled:
+  - GET /products/{pk}/ → retrieve one product
+  - PUT /products/{pk}/ / PATCH → update
+  - DELETE /products/{pk}/ → delete
+
+Each view had its own class and URL path.
+
+Now we combined all those endpoints into a single class.
+A ModelViewSet automatically includes:
+
+- list (GET all)
+- retrieve (GET one)
+- create (POST)
+- update (PUT)
+- partial_update (PATCH)
+- destroy (DELETE)
