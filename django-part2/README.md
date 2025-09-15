@@ -849,3 +849,38 @@ From just this, DRF generates:
 - PUT /products/{pk}/ → update
 - PATCH /products/{pk}/ → partial update
 - DELETE /products/{pk}/ → destroy
+
+### Manual Delete to Viewset DELETE
+
+```python
+def destroy(self, request, *args, **kwargs):
+    if OrderItem.Objects.filter(product_id=kwargs['pk']).count() > 0:
+        return Response(
+            {'error': 'Product cannot be deleted because it is associated with an order item'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+    return super().destroy(request, *args, **kwargs)
+```
+
+In the current method:
+
+- You override destroy, not delete. This is the method DRF expects in viewsets when handling DELETE requests.
+- Instead of re-implementing object retrieval, you use super().destroy(...), which calls DRF’s default logic:
+  - It runs get_object() (which respects queryset, filters, and permissions).
+  - Calls perform_destroy(instance) (where custom hooks can be defined).
+  - Returns the proper Response automatically.
+
+With the new code
+
+```python
+def destroy(self, request, *args, **kwargs):
+    if OrderItem.Objects.filter(product_id=kwargs['pk']).count() > 0:
+        return Response({'error' : 'Product cannot be deleted because it is associated with an order item'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return super().destroy(request, *args, **kwargs)
+```
+
+- You override destroy, not delete. This is the method DRF expects in viewsets when handling DELETE requests.
+- Instead of re-implementing object retrieval, you use super().destroy(...), which calls DRF’s default logic:
+  - It runs get_object() (which respects queryset, filters, and permissions).
+  - Calls perform_destroy(instance) (where custom hooks can be defined).
+  - Returns the proper Response automatically.
