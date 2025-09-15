@@ -27,10 +27,12 @@ class CollectionViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'request': self.request}
-    
-    def delete(self, request, pk):
-        collection = get_object_or_404(Collection, pk=pk)
+
+    def destroy(self, request, *args, **kwargs):
+        collection = self.get_object()
         if collection.products.count() > 0:
-            return Response({'error': 'Collection can not be deleted when it has multiple products associated with it'})
-        collection.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'error': 'Collection can not be deleted when it has multiple products associated with it'},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().destroy(request, *args, **kwargs)
