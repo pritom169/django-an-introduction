@@ -884,3 +884,22 @@ def destroy(self, request, *args, **kwargs):
   - It runs get_object() (which respects queryset, filters, and permissions).
   - Calls perform_destroy(instance) (where custom hooks can be defined).
   - Returns the proper Response automatically.
+
+## Creating the Review Model
+
+To enable customers to leave reviews for individual products, we need to define a `Review` model.
+
+```python
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)
+```
+
+After defining the model, generate a new migration and apply it to update the database schema:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
