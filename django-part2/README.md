@@ -903,3 +903,14 @@ After defining the model, generate a new migration and apply it to update the da
 python manage.py makemigrations
 python manage.py migrate
 ```
+
+## Building Reviews API
+
+First we will create the serializer for reviews.
+
+```python
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'date', 'name', 'description', 'product']
+```
