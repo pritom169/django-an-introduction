@@ -904,13 +904,13 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-## Building Reviews API
+## Nested Routers
 
-First we will create the serializer for reviews.
+Nested routers allow us to define URL patterns that represent hierarchical relationships between resources. In this project, nested routing is used to associate reviews with specific products. For example, the `reviews` endpoint is registered under `products`, enabling URLs such as:
 
 ```python
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ['id', 'date', 'name', 'description', 'product']
+- `/store/products/{product_id}/reviews/` → List or create reviews for a product
+- `/store/products/{product_id}/reviews/{id}/` → Retrieve, update, or delete a specific review
 ```
+
+This is implemented using `rest_framework_nested.routers.NestedDefaultRouter`, where the `ReviewViewSet` is nested under the `ProductViewSet` in `urls.py`.
