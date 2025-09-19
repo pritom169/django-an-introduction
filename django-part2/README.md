@@ -906,7 +906,15 @@ python manage.py migrate
 
 ## Nested Routers
 
-Nested routers allow us to define URL patterns that represent hierarchical relationships between resources. In this project, nested routing is used to associate reviews with specific products. For example, the `reviews` endpoint is registered under `products`, enabling URLs such as:
+Nested routers allow us to define URL patterns that represent hierarchical relationships between resources.
+
+We can install nested-routers with this command.
+
+```bash
+pipenv install drf-nested-routers
+```
+
+In this project, nested routing is used to associate reviews with specific products. For example, the `reviews` endpoint is registered under `products`, enabling URLs such as:
 
 ```python
 - `/store/products/{product_id}/reviews/` → List or create reviews for a product
