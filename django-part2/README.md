@@ -942,11 +942,11 @@ products_router.register('reviews', views.ReviewViewSet, basename='product-revie
     - product-reviews-list → /products/<product_pk>/reviews/
     - product-reviews-detail → /products/<product_pk>/reviews/<pk>/
 
-In this project, nested routing is used to associate reviews with specific products. For example, the `reviews` endpoint is registered under `products`, enabling URLs such as:
+### Getting a Nested Object
+
+To retrieve reviews for a specific product (e.g., `GET /products/2/reviews`), we rely on the `product_pk` parameter provided by the nested router (`products_router.register('reviews', ...)`).
 
 ```python
-- `/store/products/{product_id}/reviews/` → List or create reviews for a product
-- `/store/products/{product_id}/reviews/{id}/` → Retrieve, update, or delete a specific review
+def get_queryset(self):
+    return Review.objects.filter(product_id=self.kwargs['product_pk'])
 ```
-
-This is implemented using `rest_framework_nested.routers.NestedDefaultRouter`, where the `ReviewViewSet` is nested under the `ProductViewSet` in `urls.py`.
