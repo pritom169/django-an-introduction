@@ -914,6 +914,34 @@ We can install nested-routers with this command.
 pipenv install drf-nested-routers
 ```
 
+Now let's look at how we are setting up the nested router.
+
+```python
+products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
+```
+
+- `NestedDefaultRouter` - Works like DefaultRouter, but allows you to define routes inside another route.
+- `router` - This tells the nested router which "parent" router to attach to.
+- `products` - This is the parent prefix. It says: "Nest this router under /products/".
+- `lookup=`product`` - This sets the name of the URL parameter for the parent’s primary key. So instead of product_id, it will be called product_pk in kwargs.
+
+```python
+products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
+```
+
+- `reviews` - This is the url prefix. Combined with the parent (products), this gives you routes like:
+
+```python
+/products/<product_pk>/reviews/
+/products/<product_pk>/reviews/<pk>/
+```
+
+- `views.ReviewViewSet` - The viewset that implements the logic for those routes (list, create, retrieve, update, delete).
+- `basename='product-reviews'` - Used internally by DRF to name the URL patterns for reverse lookups.
+  - It generates names like:
+    - product-reviews-list → /products/<product_pk>/reviews/
+    - product-reviews-detail → /products/<product_pk>/reviews/<pk>/
+
 In this project, nested routing is used to associate reviews with specific products. For example, the `reviews` endpoint is registered under `products`, enabling URLs such as:
 
 ```python
