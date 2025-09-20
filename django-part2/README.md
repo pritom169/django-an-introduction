@@ -975,3 +975,23 @@ Example:
 ```python
 Review.objects.create(product_id=2, name="John", description="Great product!")
 ```
+
+## Generic Filtering
+
+Filtering by collection works, but extending filtering logic for multiple fields can quickly become complex.
+
+To handle this more efficiently, we use the third-party library `django-filter`, which provides a flexible and powerful way to filter querysets by any model field.
+
+First, install the package:
+
+```bash
+pipenv install django-filter
+```
+
+Next, add `django_filters` to your `INSTALLED_APPS` in `settings.py`:
+
+```python
+INSTALLED_APPS = [
+    "django_filters"
+]
+```
