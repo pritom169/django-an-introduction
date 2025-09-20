@@ -950,3 +950,28 @@ To retrieve reviews for a specific product (e.g., `GET /products/2/reviews`), we
 def get_queryset(self):
     return Review.objects.filter(product_id=self.kwargs['product_pk'])
 ```
+
+### Creating a Nested Object
+
+```python
+def create(self, validated_data):
+    product_id = self.context['product_id']
+    return Review.objects.create(product_id=product_id, **validated_data)
+```
+
+This runs when you submit a `POST` request to create a new review. The ReviewViewSet calls the serializer’s .save(), which internally calls `create()`. Since the request body doesn’t have the product_id (you don’t want the client to send it manually), you pull it from the context (injected when serializer is initialized by the view).
+
+Example:
+
+```python
+{
+  "name": "John",
+  "description": "Great product!"
+}
+```
+
+`create` adds `product_id=2` from `context` and creates:
+
+```python
+Review.objects.create(product_id=2, name="John", description="Great product!")
+```
