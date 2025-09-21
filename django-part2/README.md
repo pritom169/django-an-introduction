@@ -1035,3 +1035,26 @@ Then, update `views.py` by replacing the simple `filterset_fields` configuration
 ```python
 filterset_class = ProductFilter
 ```
+
+### Searching
+
+Django REST Framework provides a `SearchFilter` backend for implementing simple text-based search functionality.
+
+```python
+# 1. Import the SearchFilter
+from rest_framework.filters import SearchFilter
+
+# 2. Add the filter backend and define searchable fields in ProductViewSet
+class ProductViewSet(ModelViewSet):
+    # Existing configuration...
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'description']
+```
+
+With this setup, clients can perform searches across the specified fields (e.g., `title` and `description`) using query parameters such as:
+
+```
+/products/?search=clothing
+```
+
+This will return all products whose title or description contains the term "clothing".
