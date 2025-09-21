@@ -1013,4 +1013,25 @@ filterset_fields = ['collection_id']
 
 ### Custom Filtering
 
-Now let's take it one step further. With the pre
+For more advanced scenarios—such as filtering by both collection and a range of prices—we can define a custom filter set.
+
+Create a new `filters.py` file:
+
+```python
+from django_filters.rest_framework import FilterSet
+from .models import Product
+
+class ProductFilter(FilterSet):
+    class Meta:
+        model = Product
+        fields = {
+            'collection_id': ['exact'],
+            'unit_price': ['lt', 'gt']
+        }
+```
+
+Then, update `views.py` by replacing the simple `filterset_fields` configuration with the custom filter class:
+
+```python
+filterset_class = ProductFilter
+```
