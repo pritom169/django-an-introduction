@@ -995,3 +995,22 @@ INSTALLED_APPS = [
     "django_filters"
 ]
 ```
+
+### Implementation
+
+First, replace any custom querysets with the default:
+
+```python
+queryset = Product.objects.all()
+```
+
+Next, enable filtering support by specifying the backend and fields to filter on:
+
+```python
+filter_backends = [DjangoFilterBackend]
+filterset_fields = ['collection_id']
+```
+
+### Custom Filtering
+
+Now let's take it one step further. With the pre
