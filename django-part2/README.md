@@ -1058,3 +1058,25 @@ With this setup, clients can perform searches across the specified fields (e.g.,
 ```
 
 This will return all products whose title or description contains the term "clothing".
+
+### Sorting
+
+Django REST Framework provides the `OrderingFilter` backend to enable flexible sorting of query results.
+
+```python
+# 1. Import the OrderingFilter alongside other filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+# 2. Add OrderingFilter to the filter_backends in ProductViewSet
+class ProductViewSet(ModelViewSet):
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # 3. Define which fields can be used for ordering
+    ordering_fields = ['unit_price', 'last_update']
+```
+
+With this configuration, clients can sort results dynamically by appending an `ordering` parameter to the query string. For example:
+
+- `/products/?ordering=unit_price` → Orders products by price (ascending).
+- `/products/?ordering=-unit_price` → Orders products by price (descending).
+- `/products/?ordering=last_update` → Orders products by the last update timestamp.
