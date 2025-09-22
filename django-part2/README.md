@@ -1137,3 +1137,39 @@ class DefaultPagination(PageNumberPagination):
 
 This custom class specifies a default `page_size` of 10 items per page.  
 Once defined, you can import and apply it in your viewsets by replacing the built-in `PageNumberPagination` with your custom `DefaultPagination`.
+
+### Creating a Cart API
+
+Now let's do an exercise which will put our skills to practice. Let's create the following APIs.
+
+```
+# 1. Creating a cart
+POST /carts/
+
+When we will create a cart object, we don't need to send anything in the body, as user can put products into cart without logging in.
+
+If we send a POST request to this endpoint, we will get a CART Object back. The cart object will have a unique identifier for subsequent request. So when an user adds an item to the cart, we will send the cart Id back to the server.
+
+# 2. Getting a cart
+GET /carts/:id
+
+We get a cart by ID
+
+# 3. Deleting a cart
+DELETE /carts/:id
+
+For deleting a cart, we will send a request to this endpoint.
+
+# 4. Adding an Item
+POST /carts/:id/items
+
+When we want to add an item to the cart, we put {prodId, qty} in the body as cart id is already present in the url. It will also have a unique identifier which we will use for subsequent request.
+
+# 5. Updating an Item
+PATCH /carts/:id/items/:id
+
+The last id in the parameter is the ID of the cart item. Since we are using this API to change the only the product quantity, we will only send the {qty} in the body
+
+# 6. DELETING an ITEM
+DELETE /carts/:id/items/:id
+```
