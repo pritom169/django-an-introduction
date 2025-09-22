@@ -1108,3 +1108,17 @@ class ProductViewSet(ModelViewSet):
 ```
 
 This setup enables page-number-based pagination for product listings, with 10 results per page by default.
+
+#### Enabling Global Pagination
+
+To apply pagination across all API endpoints by default, configure it globally in `settings.py`:
+
+```python
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+```
+
+This ensures that all viewsets automatically use page-number-based pagination with a default page size of 10, unless explicitly overridden.
