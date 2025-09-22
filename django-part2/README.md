@@ -1122,3 +1122,18 @@ REST_FRAMEWORK = {
 ```
 
 This ensures that all viewsets automatically use page-number-based pagination with a default page size of 10, unless explicitly overridden.
+
+#### Defining a Custom Pagination Class
+
+While enabling global pagination provides a consistent baseline, you may want more control over pagination behavior (e.g., setting page size or customizing query parameters).  
+To achieve this, define a custom pagination class:
+
+```python
+from rest_framework.pagination import PageNumberPagination
+
+class DefaultPagination(PageNumberPagination):
+    page_size = 10
+```
+
+This custom class specifies a default `page_size` of 10 items per page.  
+Once defined, you can import and apply it in your viewsets by replacing the built-in `PageNumberPagination` with your custom `DefaultPagination`.
