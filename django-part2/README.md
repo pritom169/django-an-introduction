@@ -1080,3 +1080,31 @@ With this configuration, clients can sort results dynamically by appending an `o
 - `/products/?ordering=unit_price` → Orders products by price (ascending).
 - `/products/?ordering=-unit_price` → Orders products by price (descending).
 - `/products/?ordering=last_update` → Orders products by the last update timestamp.
+
+### Pagination
+
+Pagination helps improve performance and usability by splitting large result sets into smaller, more manageable pages.
+
+#### Configuration
+
+First, configure the default page size in `settings.py`:
+
+```python
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    'PAGE_SIZE': 10
+}
+```
+
+#### Enabling Pagination in a ViewSet
+
+Next, import and apply a pagination class in your view. For example:
+
+```python
+from rest_framework.pagination import PageNumberPagination
+
+class ProductViewSet(ModelViewSet):
+    pagination_class = PageNumberPagination
+```
+
+This setup enables page-number-based pagination for product listings, with 10 results per page by default.
