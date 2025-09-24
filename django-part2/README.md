@@ -1185,3 +1185,19 @@ class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
 ```
+
+### Enforcing Product Uniqueness in a Cart
+
+cart should not contain duplicate entries of the same product. If a user attempts to add an identical product more than once, the API should return an error. Instead of creating duplicate entries, users should only be able to update the quantity of an existing product in the cart.
+
+This constraint is enforced at the database level by defining a composite uniqueness rule on the cart and product fields:
+
+```python
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = [['cart', 'product']]
+```
