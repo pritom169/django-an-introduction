@@ -1173,3 +1173,15 @@ The last id in the parameter is the ID of the cart item. Since we are using this
 # 6. DELETING an ITEM
 DELETE /carts/:id/items/:id
 ```
+
+### Using UUID for CartID
+
+Using a simple numeric Cart ID can be insecure, as it makes it easier for malicious users to guess or manipulate IDs to access or modify other users’ carts.
+
+To mitigate this, we use a UUID (Universally Unique Identifier) as the primary key for the Cart model. UUIDs are practically impossible to guess, providing stronger protection against unauthorized access.
+
+```python
+class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
+    created_at = models.DateTimeField(auto_now_add=True)
+```
