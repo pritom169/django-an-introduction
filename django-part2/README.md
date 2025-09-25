@@ -1201,3 +1201,17 @@ class CartItem(models.Model):
     class Meta:
         unique_together = [['cart', 'product']]
 ```
+
+### Creation of a Cart
+
+#### CartViewSet defines the endpoint
+
+```python
+class CartViewSet(CreateModelMixin, GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+```
+
+- This registers an API endpoint (e.g. /store/carts/).
+- Because we don't need list, we only want to create a cart hence we are utilizing CreateModelMixin.
+- When a client sends POST /store/carts/, DRF looks at serializer_class → CartSerializer to handle validation and representation.
