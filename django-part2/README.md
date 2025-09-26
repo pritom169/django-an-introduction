@@ -1291,3 +1291,22 @@ class CartItemSerializer(serializers.ModelSerializer):
 ```
 
 By using `SimpleProductSerializer` within `CartItemSerializer`, each cart item now references a lightweight product representation that includes only the essential fields (`id`, `title`, and `unit_price`).
+
+#### Calculating the Total Price of a Cart Item
+
+To provide a more informative response, we can include a computed field that returns the total price of each cart item (quantity × unit price). This can be achieved using a `SerializerMethodField`.
+
+```python
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, cart_item: CartItem):
+        return cart_item.quantity * cart_item.product.unit_price
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'total_price']
+```
+
+With this addition, each cart item now includes a `total_price` field, giving clients immediate visibility into the cost of that item without requiring manual calculation.
