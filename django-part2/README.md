@@ -1265,3 +1265,29 @@ class CartViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 ```
+
+#### Streamlining the Product Response
+
+The current product response includes more details than may be necessary in certain contexts. To optimize the response payload and improve clarity, we can create a simplified serializer exposing only the most relevant fields.
+
+Here’s the implementation:
+
+```python
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price']
+```
+
+Now we replace Product with `SimpleProductSerializer`
+
+```python
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity']
+```
+
+By using `SimpleProductSerializer` within `CartItemSerializer`, each cart item now references a lightweight product representation that includes only the essential fields (`id`, `title`, and `unit_price`).
