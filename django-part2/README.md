@@ -1357,3 +1357,7 @@ SELECT * FROM store_cart;                           -- all carts
 SELECT * FROM store_cartitem WHERE cart_id IN (...); -- all items for those carts
 SELECT * FROM store_product WHERE id IN (...);       -- all products for those items
 ```
+
+### Enabling Cart Deletion
+
+To support cart deletion, we extend the `CartViewSet` with the `DestroyModelMixin`. This enables handling of `DELETE` requests at the `/carts/<uuid>/` endpoint, allowing clients to remove an existing cart.
