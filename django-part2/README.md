@@ -1326,3 +1326,34 @@ class CartSerializer(serializers.ModelSerializer):
 ```
 
 This ensures that the cart response includes a `total_price` field representing the combined cost of all items, providing users with an immediate overview of their cart’s value.
+
+#### Optimizing the N+1 Query Problem When Fetching Carts and Related Data
+
+When using a basic queryset such as `queryset = Cart.objects.all()`, the following occurs:
+
+- The initial query retrieves all cart records from the database.
+- Accessing `cart.items` (the related `CartItem` records) triggers a separate query for each cart.
+- For each `CartItem`, accessing the related `Product` results in yet another query.
+- This pattern leads to what is commonly known as the **N+1 query problem**.
+
+For example:
+
+```sql
+SELECT * FROM store_cart;                  -- 1 query
+SELECT * FROM store_cartitem WHERE cart_id=1;  -- 1 query per cart
+SELECT * FROM store_product WHERE id=5;       -- 1 query per item
+```
+
+We can address this inefficiency by using `prefetch_related`:
+
+- This instructs Django to fetch all carts, their items, and the related products in advance.
+- Django executes a small number of queries up front and efficiently associates the results in memory.
+- As a result, accessing `cart.items` or `cart.items[0].product` does not trigger additional database queries.
+
+This approach reduces the number of queries to just three, regardless of the number of carts or items:
+
+```sql
+SELECT * FROM store_cart;                           -- all carts
+SELECT * FROM store_cartitem WHERE cart_id IN (...); -- all items for those carts
+SELECT * FROM store_product WHERE id IN (...);       -- all products for those items
+```
