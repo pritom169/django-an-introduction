@@ -1361,3 +1361,24 @@ SELECT * FROM store_product WHERE id IN (...);       -- all products for those i
 ### Enabling Cart Deletion
 
 To support cart deletion, we extend the `CartViewSet` with the `DestroyModelMixin`. This enables handling of `DELETE` requests at the `/carts/<uuid>/` endpoint, allowing clients to remove an existing cart.
+
+### Viewing Items Within a Cart
+
+To allow clients to view the list of items associated with a specific cart, we define a nested route for cart items.
+
+We begin by creating a dedicated `CartItemViewSet` that uses the `CartItemSerializer`.
+
+```python
+class CartItemViewSet(ModelViewSet):
+    serializer_class = CartItemSerializer
+
+    def get_queryset(self):
+        return CartItem.objects.filter(cart_id=self.kwargs['cart_pk'])
+```
+
+Next, we configure the nested routes as follows:
+
+```python
+carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
+carts_router.register('items', views.CartItemViewSet, basename='cart-items')
+```
