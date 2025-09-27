@@ -1310,3 +1310,19 @@ class CartItemSerializer(serializers.ModelSerializer):
 ```
 
 With this addition, each cart item now includes a `total_price` field, giving clients immediate visibility into the cost of that item without requiring manual calculation.
+
+#### Calculating the Total Price of a Cart
+
+To calculate the total price of a cart, we aggregate the total prices of all items it contains.
+
+```python
+class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    items = CartItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, cart: Cart):
+        return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
+```
+
+This ensures that the cart response includes a `total_price` field representing the combined cost of all items, providing users with an immediate overview of their cart’s value.
