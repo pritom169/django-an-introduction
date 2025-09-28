@@ -1429,3 +1429,14 @@ Now we will add the this functionality, which passes the cart_pk to the Serializ
 def get_serializer_context(self):
         return {'cart_id': self.kwargs['cart_pk']}
 ```
+
+#### Controlling unwanted situations
+
+With the current implementation, if we add a `product_id` that does not exist the app breaks. That should not be the case. The user should be notified with proper message. In order to make it a reality, we will add the following function into the Serializer class.
+
+```python
+def validate_product_id(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError('No product with given Id was found.')
+        return value
+```
