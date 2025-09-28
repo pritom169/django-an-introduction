@@ -1382,3 +1382,50 @@ Next, we configure the nested routes as follows:
 carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 carts_router.register('items', views.CartItemViewSet, basename='cart-items')
 ```
+
+### Adding a Cart
+
+Now when we want to add a cart item and we have to perform a POST request to this url "http://localhost:8000/store/carts/<cart-id>/items/"
+
+If we want to save an item to the Cart just using product id and quantity, we have to create another Serializer.
+
+The name of the serializer will be AddCartItemSerializer.
+
+```python
+class AddCartItemSerializer(serializers.ModelSerializer):
+    # 1. For Identifying product_id we need to expose the product_id field for input.
+    product_id = serializers.IntegerField()
+
+    def save(self, **kwargs):
+        ## 2. Since the input field does not contain the cart_id, we have to extract it from the url. The `get_serializer_context`, we must pass the `cart_id`
+        cart_id = self.context['cart_id']
+
+        # 3. From the parameters in the body we will collect the product_id and quantity
+        product_id = self.validated_data['product_id']
+        quantity = self.validated_data['quantity']
+
+        # 4. Then we would try to see if the CartItem with the product_id and cart_id exists or not.
+
+        # 4a. If it exists we will increase the quantity
+        try:
+            cart_item = CartItem.objects.get(cart_id = cart_id, product_id = product_id)
+            cart_item.quantity += quantity
+            cart_item.save()
+            self.instance = cart_item
+            # 4b. If the product does not exist, we will create a cart item with new data
+        except CartItem.DoesNotExist:
+            self.instance = CartItem.objects.create(cart_id=cart_id, **self.validated_data)
+
+        return self.instance
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product_id', 'quantity']
+```
+
+Now we will add the this functionality, which passes the cart_pk to the Serializer.
+
+```python
+def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
+```
