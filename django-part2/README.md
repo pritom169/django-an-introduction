@@ -1440,3 +1440,25 @@ def validate_product_id(self, value):
             raise serializers.ValidationError('No product with given Id was found.')
         return value
 ```
+
+#### Updating a Cart Item
+
+To update a cart item, we create a dedicated serializer that allows modification of the `quantity` field.
+
+```python
+class UpdateCartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
+```
+
+We then configure the view to use this serializer when handling `PATCH` requests.
+
+```python
+def get_serializer_class(self):
+    if self.request.method == 'POST':
+        return AddCartItemSerializer
+    elif self.request.method == 'PATCH':
+        return UpdateCartItemSerializer
+    return CartItemSerializer
+```
