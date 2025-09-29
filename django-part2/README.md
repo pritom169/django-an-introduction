@@ -1462,3 +1462,7 @@ def get_serializer_class(self):
         return UpdateCartItemSerializer
     return CartItemSerializer
 ```
+
+# Django Authentication
+
+Every Django App comes with django authentication prebuilt. Now let's talk about Middlewares. In settings.py inside **MIDDLEWARE** array we can see a list of middlewares. When a request arrives, it goes through every middleware sequentially. If one middleware does not reply, it goes just to the next middleware.
