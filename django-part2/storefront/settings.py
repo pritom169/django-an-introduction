@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_filters",
     "store",
-    "store_custom",
     "tags",
-    "likes"
+    "likes",
+    "core"
 ]
 
 MIDDLEWARE = [
@@ -90,7 +90,7 @@ WSGI_APPLICATION = "storefront.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "storefront2",
+        "NAME": "storefront2-edited",
         "HOST": "localhost",
         "USER": "myuser",
         "PASSWORD": "mypassword",
@@ -143,3 +143,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
 }
+
+AUTH_USER_MODEL = 'core.User'
