@@ -1506,3 +1506,14 @@ INSTALLED_APPS = [
     "core"
 ]
 ```
+
+### Customizing User Model
+
+Django provides the `AbstractUser` base class, which includes all the fields and functionality of the default user model (e.g., `username`, `password`, `first_name`, `last_name`, etc.). By extending `AbstractUser`, you retain all built-in authentication features while being able to override or add fields as needed.
+
+In the example below, the `email` field is redefined with `unique=True`. Although `AbstractUser` already includes an `email` field, it is not unique by default. Redefining it ensures that each user must have a distinct email address, making it suitable for authentication and preventing duplicate accounts.
+
+```python
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+```
