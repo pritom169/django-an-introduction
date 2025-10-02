@@ -1517,3 +1517,11 @@ In the example below, the `email` field is redefined with `unique=True`. Althoug
 class User(AbstractUser):
     email = models.EmailField(unique=True)
 ```
+
+### Defining Custom User Model
+
+When you define a custom user model, you should also tell Django to use it in your settings.py:
+
+```python
+AUTH_USER_MODEL = "core.User"
+```
