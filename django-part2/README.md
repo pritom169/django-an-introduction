@@ -1466,3 +1466,43 @@ def get_serializer_class(self):
 # Django Authentication
 
 Every Django App comes with django authentication prebuilt. Now let's talk about Middlewares. In settings.py inside **MIDDLEWARE** array we can see a list of middlewares. When a request arrives, it goes through every middleware sequentially. If one middleware does not reply, it goes just to the next middleware.
+
+## Restructuring the project
+
+### Renaming the Application
+
+To improve clarity and organization, we will restructure the project by consolidating shared functionality into a dedicated application named core.
+
+#### Updating the App Configuration
+
+```python
+# core/apps.py
+from django.apps import AppConfig
+
+class CoreConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "core"
+```
+
+#### Updating Installed Applications
+
+After renaming the app, update the INSTALLED_APPS in settings.py. Replace the previous store_custom entry with core:
+
+```python
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "playground",
+    "debug_toolbar",
+    "django_filters",
+    "store",
+    "tags",
+    "likes",
+    "core"
+]
+```
