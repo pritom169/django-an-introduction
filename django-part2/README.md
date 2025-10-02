@@ -1557,3 +1557,25 @@ To resolve this, we have two options:
 2. **Create a new database** – and apply the migrations there.
 
 Both approaches ensure that the schema is rebuilt cleanly with the custom user model in place.
+
+### Extending UserAdmin
+
+By default, Django’s `BaseUserAdmin` class only displays the `username` and password fields (`password1`, `password2`) when creating a new user in the admin interface.
+
+To provide a more complete user creation form, we can extend `BaseUserAdmin` to include additional fields such as `email`, `first_name`, and `last_name`:
+
+```python
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "password1", "password2", "email", "first_name", "last_name"),
+            },
+        ),
+    )
+```
+
+This customization ensures that when administrators create new users, they can capture both login credentials and essential profile details in a single step.
