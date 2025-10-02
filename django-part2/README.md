@@ -1525,3 +1525,24 @@ When you define a custom user model, you should also tell Django to use it in yo
 ```python
 AUTH_USER_MODEL = "core.User"
 ```
+
+### Importing the User Model Correctly
+
+When defining a foreign key to the user model, avoid referencing `User` directly. Doing so can cause migration issues if your project uses a custom user model instead of Django’s default.
+
+❌ Incorrect (direct reference to `User`):
+
+```python
+user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
+
+✅ Correct (dynamic reference to the active user model):
+
+```python
+from django.conf import settings
+
+user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+```
+
+By using `settings.AUTH_USER_MODEL`, Django always points to the currently active user model — whether it is the default `auth.User` or a custom model defined in your project (e.g., `AUTH_USER_MODEL = "core.User"`).  
+This approach ensures consistency, portability, and future-proofing of your codebase.
