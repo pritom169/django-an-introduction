@@ -1546,3 +1546,14 @@ user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 By using `settings.AUTH_USER_MODEL`, Django always points to the currently active user model — whether it is the default `auth.User` or a custom model defined in your project (e.g., `AUTH_USER_MODEL = "core.User"`).  
 This approach ensures consistency, portability, and future-proofing of your codebase.
+
+### Creating a New Database
+
+The initial migration of the admin app is tied to the default user model. Once a custom user model is introduced, it cannot simply replace the existing user model mid-project.
+
+To resolve this, we have two options:
+
+1. **Drop and recreate the existing database** – removing all previous data and applying migrations from scratch.
+2. **Create a new database** – and apply the migrations there.
+
+Both approaches ensure that the schema is rebuilt cleanly with the custom user model in place.
