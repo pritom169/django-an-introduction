@@ -1579,3 +1579,15 @@ class UserAdmin(BaseUserAdmin):
 ```
 
 This customization ensures that when administrators create new users, they can capture both login credentials and essential profile details in a single step.
+
+### Connecting the User Model with Customer
+
+To associate each customer with exactly one user account, we define a one-to-one relationship between the `Customer` model and the active user model.
+
+`settings.AUTH_USER_MODEL` ensures that the relationship dynamically references whichever user model is configured in the project (either the default `auth.User` or a custom implementation).
+
+```python
+user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+```
+
+With `on_delete=models.CASCADE`, deleting a user will automatically remove the associated customer record, maintaining data consistency.
