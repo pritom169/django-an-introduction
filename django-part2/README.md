@@ -1619,3 +1619,15 @@ class Meta:
 The `list_select_related` option optimizes database queries in the Django Admin by performing a SQL JOIN to fetch related `User` objects in the same query as `Customer` objects.  
 Without this optimization, displaying 100 customers would trigger an additional 100 queries to fetch each related user.  
 With `list_select_related = ['user']`, both `Customer` and `User` data are retrieved in a single query, significantly improving performance.
+
+### Incorporating User Fields in Admin Configuration
+
+To ensure consistency and avoid redundant data, we now reference the `first_name` and `last_name` fields directly from the related `User` model instead of duplicating them in the `Customer` model.
+
+```python
+ordering = ['user__first_name', 'user__last_name']
+search_fields = ['user__first_name__istartswith', 'user__last_name__istartswith']
+```
+
+- `ordering` ensures that customer records are sorted alphabetically by the associated user’s first and last name.
+- `search_fields` enables efficient search functionality in the Django admin by allowing case-insensitive queries that match the beginning of the user’s first or last name.
