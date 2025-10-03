@@ -1595,3 +1595,21 @@ With `on_delete=models.CASCADE`, deleting a user will automatically remove the a
 ### Removing Redundant Fields
 
 Because the Customer model already has a one-to-one relationship with the User model, certain fields are unnecessary. Specifically, first_name, last_name, and email can be removed from the Customer model since they are already provided by the User model.
+
+### Incorporating User Fields into Customer
+
+Now in the customer model, we have to refer to the `first_name` and `last_name` from the user. We have to incorporate them in the following code as well.
+
+```python
+def __str__(self):
+    return f'{self.user.first_name} {self.user.last_name}'
+
+class Meta:
+    db_table = 'store_customers'
+    ordering = ['user__first_name', 'user__last_name']
+```
+
+- The **str** method defines the string representation of a Customer instance. Here, it concatenates the first and last name of the related User object. This makes Customer entries more meaningful when displayed in the Django admin interface or console, showing "John Doe" instead of a generic "Customer object (1)".
+  - The Meta class provides configuration for the model:
+  - db_table = 'store_customers' explicitly sets the database table name.
+- ordering = ['user__first_name', 'user__last_name'] ensures that query results are automatically sorted alphabetically by the related user’s first name and then last name.
