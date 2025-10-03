@@ -73,8 +73,9 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'membership', 'orders_count']
     list_editable = ['membership']
     list_per_page = 10
-    ordering = ['first_name', 'last_name']
-    search_fields = ['first_name__istartswith', 'last_name__istartswith']
+    list_select_related = ['user']
+    ordering = ['user__first_name', 'user__last_name']
+    search_fields = ['user__first_name__istartswith', 'user__last_name__istartswith']
 
     @admin.display(ordering='orders_count',description="Orders")
     def orders_count(self, customer):
@@ -85,6 +86,12 @@ class CustomerAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
             orders_count = Count('order'))
+
+    def first_name(self, customer):
+        return customer.user.first_name
+
+    def last_name(self, customer):
+        return customer.user.last_name
 
 class OrderItemInline(admin.StackedInline):
     autocomplete_fields = ['product']

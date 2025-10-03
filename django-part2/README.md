@@ -1591,3 +1591,7 @@ user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 ```
 
 With `on_delete=models.CASCADE`, deleting a user will automatically remove the associated customer record, maintaining data consistency.
+
+### Removing Redundant Fields
+
+Because the Customer model already has a one-to-one relationship with the User model, certain fields are unnecessary. Specifically, first_name, last_name, and email can be removed from the Customer model since they are already provided by the User model.
