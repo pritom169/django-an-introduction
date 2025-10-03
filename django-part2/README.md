@@ -1613,3 +1613,9 @@ class Meta:
   - The Meta class provides configuration for the model:
   - db_table = 'store_customers' explicitly sets the database table name.
 - ordering = ['user__first_name', 'user__last_name'] ensures that query results are automatically sorted alphabetically by the related user’s first name and then last name.
+
+### Making Queries a bit efficient
+
+The `list_select_related` option optimizes database queries in the Django Admin by performing a SQL JOIN to fetch related `User` objects in the same query as `Customer` objects.  
+Without this optimization, displaying 100 customers would trigger an additional 100 queries to fetch each related user.  
+With `list_select_related = ['user']`, both `Customer` and `User` data are retrieved in a single query, significantly improving performance.
