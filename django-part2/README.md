@@ -1631,3 +1631,15 @@ search_fields = ['user__first_name__istartswith', 'user__last_name__istartswith'
 
 - `ordering` ensures that customer records are sorted alphabetically by the associated user’s first and last name.
 - `search_fields` enables efficient search functionality in the Django admin by allowing case-insensitive queries that match the beginning of the user’s first or last name.
+
+### Incorporating name fields into CustomerAdmin
+
+As right now, `first_name` and `last_name` does not exist in the Customer. So we have to create custom function which fetches `first_name` and `last_name` from the user.
+
+```python
+def first_name(self, customer):
+    return customer.user.first_name
+
+def last_name(self, customer):
+    return customer.user.last_name
+```
