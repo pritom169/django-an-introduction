@@ -1656,7 +1656,7 @@ Since the store_customers table already contains existing records, Django requir
 
 > Summary: A new user field is added to the Customer table, and existing rows are updated to reference user ID 1.
 
-### Addition of Sorting
+### Addition of Sorting in the Store Admin
 
 To enable sorting of customers by their associated user’s first and last names in the Django admin interface, we define the following methods:
 
