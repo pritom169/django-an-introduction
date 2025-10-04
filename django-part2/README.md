@@ -1655,3 +1655,17 @@ This ensures that each customer is associated with a single user account, and th
 Since the store_customers table already contains existing records, Django requires a value for the new user field in these rows. For this migration, all existing customers are assigned the user with ID 1.
 
 > Summary: A new user field is added to the Customer table, and existing rows are updated to reference user ID 1.
+
+### Addition of Sorting
+
+To enable sorting of customers by their associated user’s first and last names in the Django admin interface, we define the following methods:
+
+```python
+@admin.display(ordering='user__first_name')
+def first_name(self, customer):
+    return customer.user.first_name
+
+@admin.display(ordering='user__last_name')
+def last_name(self, customer):
+    return customer.user.last_name
+```
