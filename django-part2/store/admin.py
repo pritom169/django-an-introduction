@@ -86,10 +86,12 @@ class CustomerAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
             orders_count = Count('order'))
-
+    
+    @admin.display(ordering='user__first_name')
     def first_name(self, customer):
         return customer.user.first_name
-
+    
+    @admin.display(ordering='user__last_name')
     def last_name(self, customer):
         return customer.user.last_name
 
