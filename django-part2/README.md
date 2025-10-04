@@ -1643,3 +1643,15 @@ def first_name(self, customer):
 def last_name(self, customer):
     return customer.user.last_name
 ```
+
+## Migrating from Customer to Core User
+
+```python
+user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+```
+
+This ensures that each customer is associated with a single user account, and the field is non-nullable (null=False by default).
+
+Since the store_customers table already contains existing records, Django requires a value for the new user field in these rows. For this migration, all existing customers are assigned the user with ID 1.
+
+> Summary: A new user field is added to the Customer table, and existing rows are updated to reference user ID 1.
