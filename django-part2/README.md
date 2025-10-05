@@ -1669,3 +1669,9 @@ def first_name(self, customer):
 def last_name(self, customer):
     return customer.user.last_name
 ```
+
+## Authentication
+
+Django includes a built-in authentication system that manages users, passwords, and permissions. However, it does not provide an API interface out of the box.
+
+Djoser is a RESTful implementation of Django’s authentication system. It exposes ready-to-use API endpoints for essential authentication tasks such as user registration, login, password reset, and account management, making it easy to integrate secure user authentication into Django REST Framework–based projects.
