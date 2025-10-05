@@ -1764,3 +1764,31 @@ Each validator enforces a specific password policy to improve account security:
 - **`NumericPasswordValidator`** – Disallows passwords composed entirely of numbers, such as “12345678”.
 
 Together, these validators ensure that user passwords follow best practices for complexity and uniqueness, reducing the risk of weak or easily compromised credentials.
+
+### Capturing Additional Fields During User Registration
+
+By default, Djoser allows users to register with only an email, username, and password. However, in many cases, it’s desirable to collect additional user details—such as the first and last name—during registration.
+
+To achieve this, we extend Djoser’s built-in serializer, which handles both serialization and deserialization of user data. Because this customization is specific to our project, we will define it within a new file named `serializers.py`.
+
+```python
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name']
+```
+
+Here, we override the `Meta` class from Djoser’s `UserCreateSerializer` to include the `first_name` and `last_name` fields. Overriding the `Meta` class directly ensures that our implementation remains compatible with future updates to Djoser’s core serializer.
+
+Once the custom serializer is defined, it must be registered in the project’s settings file so that Djoser uses it instead of the default serializer:
+
+```python
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'core.serializers.UserCreateSerializer'
+    }
+}
+```
+
+With this configuration, new users can now provide their first and last names during registration, allowing for a more complete user profile upon account creation.
