@@ -1681,3 +1681,27 @@ Djoser is a RESTful implementation of Django’s authentication system. It expos
 In Django REST Framework, authentication can be handled either through simple authentication tokens or through JSON Web Tokens (JWT). A standard authentication token (used by DRF’s TokenAuthentication) is a randomly generated string stored in the database. When a user logs in, the server creates this token and saves it in a dedicated table (authtoken_token). For each subsequent request, the client sends the token in the header (e.g., Authorization: Token <token>), and the server looks it up in the database to identify the user. This method is easy to implement and ideal for small or internal projects, but it requires a database lookup on every request and does not scale efficiently across multiple servers.
 
 JWT-based authentication, on the other hand, is stateless and self-contained. Instead of storing tokens in the database, the server generates a signed JWT containing user information such as the user ID and token expiration time. Clients then include this token in each request (e.g., Authorization: Bearer <jwt>), and the server verifies it using a secret key—no database lookup is needed. This makes JWTs much more scalable and efficient for distributed systems. However, JWTs are harder to revoke once issued, as they remain valid until they expire, making token invalidation slightly more complex.
+
+### Installing JWT for Django
+
+To enable JWT-based authentication in Django, first ensure that **Djoser** is installed and registered in your project’s `INSTALLED_APPS` list.
+
+```python
+INSTALLED_APPS = [
+    ...
+    "djoser",
+    ...
+]
+```
+
+Next, configure the authentication endpoints by including Djoser’s URL patterns in your main `urls.py` file. This setup provides access to standard authentication routes (for registration, login, logout, etc.) as well as JWT-specific endpoints for token management.
+
+```python
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("playground/", include("playground.urls")),
+    path("store/", include("store.urls")),
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
+] + debug_toolbar_urls()
+```
