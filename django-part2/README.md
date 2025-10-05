@@ -1792,3 +1792,74 @@ DJOSER = {
 ```
 
 With this configuration, new users can now provide their first and last names during registration, allowing for a more complete user profile upon account creation.
+
+### Customer Account Creation Endpoint
+
+#### 1\. Serializer Definition
+
+The first step is to define a serializer that will handle the data validation and conversion for the `Customer` model.
+
+The `CustomerSerializer` is designed specifically for this purpose. It includes all necessary fields from the `Customer` model and an additional `user_id` field to associate the customer profile with a user account.
+
+```python
+# serializers.py
+
+from rest_framework import serializers
+from .models import Customer
+
+class CustomerSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Customer model. It handles the creation and representation
+    of customer data.
+    """
+    # The user_id is explicitly included to accept the ID of the related user
+    # during the creation process, as the User object itself is not part of the
+    # Customer model's direct fields.
+    user_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'user_id', 'phone', 'birth_date', 'membership']
+```
+
+---
+
+#### 2\. ViewSet Implementation
+
+Next, we implement the `CustomerViewSet` to define the API logic. Instead of using the full `ModelViewSet`, we selectively inherit from specific mixins (`CreateModelMixin`, `RetrieveModelMixin`, `UpdateModelMixin`) and `GenericViewSet`.
+
+This approach intentionally **disables the list endpoint** (i.e., `GET /customers/`), preventing unauthorized users from viewing a complete list of all customers while still providing endpoints to create, retrieve, and update individual customer instances.
+
+```python
+# views.py
+
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
+from .models import Customer
+from .serializers import CustomerSerializer
+
+class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    """
+    A viewset for creating, viewing, and updating customer profiles.
+
+    This viewset explicitly excludes the 'list' action to prevent exposure
+    of all customer data.
+    """
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+```
+
+---
+
+#### 3\. URL Configuration
+
+Finally, we register the `CustomerViewSet` with the Django REST Framework's router in the `urls.py` file. The router automatically generates the necessary URL patterns for the actions enabled in the viewset.
+
+Following RESTful conventions, the endpoint is registered as `customers`.
+
+```python
+router = routers.DefaultRouter()
+router.register('products', views.ProductViewSet, basename='product')
+router.register('collections', views.CollectionViewSet)
+router.register('carts', views.CartViewSet)
+```
