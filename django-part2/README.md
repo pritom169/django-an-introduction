@@ -1705,3 +1705,62 @@ urlpatterns = [
     path("auth/", include("djoser.urls.jwt")),
 ] + debug_toolbar_urls()
 ```
+
+### Password Validators
+
+When making a `POST` request with the following data:
+
+```json
+{
+  "email": "hello@gmail.com",
+  "username": "hellogmail",
+  "password": "12345678"
+}
+```
+
+the API returns the following validation response:
+
+```json
+{
+  "password": [
+    "This password is too common.",
+    "This password is entirely numeric."
+  ]
+}
+```
+
+This occurs because Django enforces password security rules defined in the `AUTH_PASSWORD_VALIDATORS` setting within `settings.py`:
+
+```python
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
+```
+
+Each validator enforces a specific password policy to improve account security:
+
+- **`UserAttributeSimilarityValidator`** – Prevents the use of passwords that closely resemble the user’s personal attributes, such as their username, email, or name.
+- **`MinimumLengthValidator`** – Ensures that passwords meet a minimum length requirement (default: 8 characters). You can adjust this rule by specifying an option, for example:
+
+  ```python
+  {
+      "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+      "OPTIONS": {"min_length": 10}
+  }
+  ```
+
+- **`CommonPasswordValidator`** – Rejects passwords that are too common or appear in lists of easily guessable passwords (e.g., “password123”, “qwerty”).
+- **`NumericPasswordValidator`** – Disallows passwords composed entirely of numbers, such as “12345678”.
+
+Together, these validators ensure that user passwords follow best practices for complexity and uniqueness, reducing the risk of weak or easily compromised credentials.
