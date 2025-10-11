@@ -1894,3 +1894,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1)
 }
 ```
+
+## Dimistifying JSON Web Token
+
+To learn more about JSON Web Token hop into [jwt.io](jwt.io).
