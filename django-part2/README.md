@@ -1863,3 +1863,21 @@ router.register('products', views.ProductViewSet, basename='product')
 router.register('collections', views.CollectionViewSet)
 router.register('carts', views.CartViewSet)
 ```
+
+### Logging In
+
+Unlike Token-Based Authentication, which requires a database lookup for each request, JWT (JSON Web Token) authentication enables stateless login — no database call is needed during authentication.
+
+To authenticate using JWT, send a POST request to `{baseurl}/jwt/token` with your username and password. A successful login returns both an `access` token and a `refresh` token:
+
+```python
+{
+    "refresh": "<refresh_token>",
+    "access": "<access_token>"
+}
+```
+
+- The `access` token is used to authenticate requests to protected API endpoints. It is short-lived and typically expires after **5 minutes**.
+- When the `access` token expires, the `refresh` token — valid for **24 hours** by default — can be used to obtain a new one without re-entering credentials.
+
+For detailed configuration options, refer to the [Django REST Framework SimpleJWT documentation](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html).
