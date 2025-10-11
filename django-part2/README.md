@@ -1881,3 +1881,16 @@ To authenticate using JWT, send a POST request to `{baseurl}/jwt/token` with you
 - When the `access` token expires, the `refresh` token — valid for **24 hours** by default — can be used to obtain a new one without re-entering credentials.
 
 For detailed configuration options, refer to the [Django REST Framework SimpleJWT documentation](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html).
+
+#### Customizing the Lifetime of JWT Tokens
+
+By default, the JWT access token expires after 5 minutes. However, during development, it can be useful to extend this duration to simplify testing.  
+For example, the following configuration sets the access token lifetime to 1 day:
+
+```python
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1)
+}
+```
