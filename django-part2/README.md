@@ -1898,3 +1898,17 @@ SIMPLE_JWT = {
 ## Dimistifying JSON Web Token
 
 To learn more about JSON Web Token hop into [jwt.io](jwt.io).
+
+## Refreshing tokens
+
+When accessing a protected API, clients must include a valid access token with their request. If the access token has expired, the server will return a 401 Unauthorized response.
+
+In this case, the client can obtain a new access token by calling the refresh endpoint and providing the existing refresh token.
+
+To refresh the token, send a POST request to:
+
+```python
+<base_url>/auth/jwt/refresh/
+```
+
+This endpoint returns a new access token, allowing continued access without requiring the user to log in again.
