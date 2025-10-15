@@ -149,10 +149,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
-}
-
 AUTH_USER_MODEL = 'core.User'
 
 DJOSER = {
@@ -162,5 +158,6 @@ DJOSER = {
 }
 
 SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1)
 }
