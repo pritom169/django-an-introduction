@@ -1929,3 +1929,28 @@ Once the header is configured, send a request to:
 ```
 http://localhost:8080/auth/users/me/
 ```
+
+### Retrieving Additional User Information
+
+By default, when accessing the **{base_url}/auth/users/me/** endpoint, only basic user details are returned. To include additional fields such as the user’s first and last name, we can extend Djoser’s built-in UserSerializer.
+
+The custom serializer below overrides the default implementation to include these additional attributes:
+
+```python
+from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
+
+class UserSerializer(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+```
+
+After Creating the serializer we have to add it to `settings.py`
+
+```python
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'core.serializers.UserCreateSerializer',
+        'current_user': 'core.serializers.UserSerializer'
+    }
+}
+```
