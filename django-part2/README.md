@@ -1912,3 +1912,20 @@ To refresh the token, send a POST request to:
 ```
 
 This endpoint returns a new access token, allowing continued access without requiring the user to log in again.
+
+### Retrieve the current user
+
+To retrieve information about the currently authenticated user, include the access token in the request header. This can be done using a browser extension such as ModHeader.
+
+1. Add an Authorization Header
+
+- Header Name: Authorization
+- Header Value: JWT {access_token}
+
+2. Access the User Endpoint
+
+Once the header is configured, send a request to:
+
+```
+http://localhost:8080/auth/users/me/
+```
