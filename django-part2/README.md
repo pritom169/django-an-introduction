@@ -1954,3 +1954,29 @@ DJOSER = {
     }
 }
 ```
+
+### Getting Current User's Profile
+
+```python
+MIDDLEWARE = [
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+]
+```
+
+If we look at the `settings.py` of storefront app we will see the authentication middleware. It will look at the request and if there is a matching user, it will attach the user object to the request.
+
+```python
+    @action(detail=False, methods=['GET', 'PUT'])
+    def me(self, request):
+        customer = Customer.objects.get(user_id=request.user.id)
+        serializer = CustomerSerializer(customer)
+        return Response(serializer.data)
+```
+
+In the code when we write `@action(detail=False)`, it means the custom route does not require an object ID (like /customers/3/). So the URL will look like:
+
+```python
+{base_url}/store/customers/me/
+```
+
+The serializer is determining how the response will look like and finally returning the data.
