@@ -98,7 +98,7 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['quantity']
 
-class CustomSerializer(serializers.ModelSerializer):
+class CustomerSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField()
 
     class Meta:
