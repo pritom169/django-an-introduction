@@ -1966,7 +1966,7 @@ MIDDLEWARE = [
 If we look at the `settings.py` of storefront app we will see the authentication middleware. It will look at the request and if there is a matching user, it will attach the user object to the request.
 
 ```python
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False)
     def me(self, request):
         customer = Customer.objects.get(user_id=request.user.id)
         serializer = CustomerSerializer(customer)
@@ -1980,3 +1980,25 @@ In the code when we write `@action(detail=False)`, it means the custom route doe
 ```
 
 The serializer is determining how the response will look like and finally returning the data.
+
+#### Changing the User Profile Data
+
+Updating user profile information is performed through a PUT request. The following method conditionally handles both retrieval and update operations for the currently authenticated user:
+
+```python
+def me(self, request):
+    customer, created = Customer.objects.get_or_create(user_id=request.user.id)
+    if request.method == 'GET':
+        serializer = CustomerSerializer(customer)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CustomerSerializer(customer, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+```
+
+- `serializer = CustomerSerializer(customer, data=request.data)` — Initializes a serializer instance with the existing customer object and incoming request data for update validation.
+- `serializer.is_valid(raise_exception=True)` — Validates the input data; raises a `ValidationError` if invalid.
+- `serializer.save()` — Persists the validated data to the database using the serializer’s internal `.update()` method.
+- After saving, the updated customer data is re-serialized and returned as a JSON response.
