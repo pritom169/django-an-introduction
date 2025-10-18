@@ -2030,3 +2030,17 @@ def get_permissions(self):
         return [AllowAny()]
     return [IsAuthenticated()]
 ```
+
+### Applying custom permission
+
+In Django REST Framework, you can define custom permission classes to enforce fine-grained access control beyond the built-in options.
+
+The example below defines a permission rule that allows unrestricted access for safe (read-only) requests such as GET, while restricting all other request methods to authenticated admin users only:
+
+```python
+class IsAdminOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        return bool(request.user and request.user.is_staff)
+```
