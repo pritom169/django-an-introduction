@@ -2017,3 +2017,16 @@ class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, Ge
   > Authenticated users → can access /store/customers/... endpoints.
 
   > Anonymous users → blocked immediately with 401 Unauthorized.
+
+#### Applying permission to Specific Methods
+
+In Django REST Framework, permissions can be selectively applied to individual HTTP methods within a viewset by overriding the get_permissions() method.
+
+For example, the following implementation allows unauthenticated (anonymous) users to access GET requests, while restricting all other request types to authenticated users only:
+
+```python
+def get_permissions(self):
+    if self.request.method == 'GET':
+        return [AllowAny()]
+    return [IsAuthenticated()]
+```
