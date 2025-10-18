@@ -2002,3 +2002,18 @@ def me(self, request):
 - `serializer.is_valid(raise_exception=True)` — Validates the input data; raises a `ValidationError` if invalid.
 - `serializer.save()` — Persists the validated data to the database using the serializer’s internal `.update()` method.
 - After saving, the updated customer data is re-serialized and returned as a JSON response.
+
+### Applying Permissions
+
+In Django REST Framework, permissions can be applied at the viewset level to restrict access to specific API endpoints.
+
+```python
+class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+```
+
+- `permission_classes = [IsAuthenticated]` - tells Django REST Framework that only authenticated users are allowed to access any endpoint in this CustomerViewSet.
+
+  > Authenticated users → can access /store/customers/... endpoints.
+
+  > Anonymous users → blocked immediately with 401 Unauthorized.
