@@ -2044,3 +2044,17 @@ class IsAdminOrReadOnly(BasePermission):
             return True
         return bool(request.user and request.user.is_staff)
 ```
+
+#### Refining custom permission
+
+The previous implementation effectively restricts access based on the request method but overlooks HEAD and OPTIONS requests, which should also be permitted for read-only operations.
+
+To address this, Django REST Framework provides a predefined constant, SAFE_METHODS, which includes all HTTP methods considered non-destructive (GET, HEAD, and OPTIONS). Using this constant ensures cleaner and more accurate permission handling.
+
+```python
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == permissions.SAFE_METHODS:
+            return True
+        return bool(request.user and request.user.is_staff)
+```
