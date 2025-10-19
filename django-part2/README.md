@@ -2060,3 +2060,26 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 ```
 
 We also have to apply the same permission class to ProductViewSet and CustomerViewSet. We can simply do it by adding `permission_classes = [IsAuthenticated]`
+
+### Refactoring the CustomerViewSet
+
+In this implementation, administrative users should have access to all customer records, while regular authenticated users should only be able to view or update their own profile. To achieve this, we assign IsAdminUser as the default permission class for the viewset and override it for the custom me endpoint to allow access to authenticated users.
+
+```python
+class CustomerViewSet(ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAdminUser]
+
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        (customer, created) = Customer.objects.get_or_create(user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+```
