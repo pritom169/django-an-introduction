@@ -2054,7 +2054,9 @@ To address this, Django REST Framework provides a predefined constant, SAFE_METH
 ```python
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == permissions.SAFE_METHODS:
+        if request.method in permissions.SAFE_METHODS:
             return True
         return bool(request.user and request.user.is_staff)
 ```
+
+We also have to apply the same permission class to ProductViewSet and CustomerViewSet. We can simply do it by adding `permission_classes = [IsAuthenticated]`
