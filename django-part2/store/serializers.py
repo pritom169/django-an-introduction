@@ -106,6 +106,8 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_id', 'phone', 'birth_date', 'membership']
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'unit_price', 'order']
