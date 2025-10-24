@@ -123,8 +123,8 @@ class OrderSerializer(serializers.ModelSerializer):
 class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
-    with transaction.atomic():
-        def save(self, **kwargs):
+    def save(self, **kwargs):
+        with transaction.atomic():
             cart_id = self.validated_data['cart_id']
 
             (customer, created) = Customer.objects.get_or_create(user_id=self.context['user_id'])
@@ -140,8 +140,7 @@ class CreateOrderSerializer(serializers.Serializer):
                     quantity=item.quantity
                 ) for item in cart_items
             ]
-            OrderItem.objects.bulk_create(order_items)
 
+            OrderItem.objects.bulk_create(order_items)
             Cart.objects.filter(pk=cart_id).delete()
-            
             return order
