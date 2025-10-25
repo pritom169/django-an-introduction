@@ -156,5 +156,5 @@ class CreateOrderSerializer(serializers.Serializer):
 
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Order
+        model = Order
         fields = ['payment_status']
