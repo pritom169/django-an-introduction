@@ -2103,4 +2103,25 @@ class OrderSerializer(serializers.ModelSerializer):
 
 This setup ensures that when an order is retrieved through the API, the response will include a complete list of its items, each with detailed product information, providing a comprehensive and self-contained representation of the order.
 
-### Signals
+### Setting up ViewSet for CRUD Operation
+
+```python
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+```
+
+this code sets up the foundation for the OrderViewSet, which handles all API requests related to orders. Here's what each part does:
+
+- `class OrderViewSet(ModelViewSet):`: This defines a viewset that automatically provides the standard set of API actions for a model:
+
+  - list (GET all orders)
+  - create (POST a new order)
+  - retrieve (GET a single order)
+  - update (PUT an order)
+  - partial_update (PATCH an order)
+  - destroy (DELETE an order)
+
+- `queryset = Order.objects.all()`: This sets the default collection of objects that this viewset will operate on. In this case, it's all the orders in your database.
+
+- `serializer_class = OrderSerializer`: This specifies the default serializer to use for converting Order objects to and from JSON.
