@@ -2083,3 +2083,24 @@ class CustomerViewSet(ModelViewSet):
             serializer.save()
             return Response(serializer.data)
 ```
+
+## Creating APIs for Order
+
+### Defining the Order Serializer
+
+To control the representation of `Order` objects in the API, we define an `OrderSerializer`. This serializer specifies which fields are exposed and how related data, such as order items, should be nested within the response.
+
+The `OrderSerializer` inherits from `serializers.ModelSerializer`, which automatically generates fields based on the `Order` model. The `Meta` class is used to configure the serializer, specifying the model it is based on and the fields to include in the serialized output.
+
+To represent the line items associated with an order, we use a nested `OrderItemSerializer`. The `items` field is configured with `many=True` and `read_only=True` to indicate that an order can have multiple items and that they should not be writable through this endpoint.
+
+```python
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'placed_at', 'payment_status', 'customer', 'items']
+```
+
+This setup ensures that when an order is retrieved through the API, the response will include a complete list of its items, each with detailed product information, providing a comprehensive and self-contained representation of the order.
+
+### Signals
