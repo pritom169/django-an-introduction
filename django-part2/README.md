@@ -2125,3 +2125,11 @@ this code sets up the foundation for the OrderViewSet, which handles all API req
 - `queryset = Order.objects.all()`: This sets the default collection of objects that this viewset will operate on. In this case, it's all the orders in your database.
 
 - `serializer_class = OrderSerializer`: This specifies the default serializer to use for converting Order objects to and from JSON.
+
+### Registering the OrderViewSet in urls.py
+
+Now let's register the OrderViewSet in urls.py to make it discoverable via the `store/orders` url
+
+```python
+router.register('orders', views.OrderViewSet)
+```
