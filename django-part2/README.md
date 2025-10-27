@@ -2133,3 +2133,7 @@ Now let's register the OrderViewSet in urls.py to make it discoverable via the `
 ```python
 router.register('orders', views.OrderViewSet)
 ```
+
+### Calling all the OrderItems only via `items`
+
+When from order we need to call orderItems, however it makes sense to call them just items. To perform it we have to include the following code in OrderItem model.
